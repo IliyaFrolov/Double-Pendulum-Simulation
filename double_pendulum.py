@@ -11,7 +11,7 @@ class Pendulum():
         self.g = 9.8
         self.L1 = length_1
         self.L2 = length_2
-        self.m1 = mass_2
+        self.m1 = mass_1
         self.m2 = mass_2
         self.time = np.linspace(0, time, steps+1)
         self.K1 = KineticEnergy1(length_1, mass_1)
