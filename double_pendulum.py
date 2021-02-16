@@ -1,18 +1,9 @@
 import numpy as np
+from numpy import pi, cos, sin
 import pandas as pd
 import math
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
-
-class Pendulum():
-
-    def __init__(self, length, mass, initial_angular_position, initial_angular_velocity, steps):
-        self.L = length
-        self.m = mass
-        self.angular_position = np.zeros(steps+1)
-        self.angular_velocity = np.zeros(steps+1)
-        self.angular_position[0] = initial_angular_position
-        self.angular_velocity[0] = initial_angular_velocity
 
 class System():
 
@@ -28,8 +19,8 @@ class System():
         omega_1 = initial_conditions[1]
         theta_2 = initial_conditions[2]
         omega_2 = initial_conditions[3]
-        dwdt_1 = (-self.g*(2*self.p1.m+self.p2.m)*np.sin(theta_1)-self.p2.m*self.g*np.sin(theta_1-2*theta_2)-2*np.sin(theta_1-theta_2)*self.p2.m*(omega_2**2*self.p2.L+omega_1**2*self.p1.L*np.cos(theta_1-theta_2))) / (self.p1.L*(2*self.p1.m+self.p2.m-self.p2.m*np.cos(2*theta_1-2*theta_2)))
-        dwdt_2 = (2*np.sin(theta_1-theta_2)*(omega_1**2*self.p1.L*(self.p1.m+self.p2.m)+self.g*(self.p1.m+self.p2.m)*np.cos(theta_1)+omega_2**2*self.p2.L*self.p2.m*np.cos(theta_1-theta_2))) / (self.p2.L*(2*self.p1.m+self.p2.m-self.p2.m*np.cos(2*theta_1-2*theta_2)))
+        dwdt_1 = (-self.g*(2*self.p1.m+self.p2.m)*sin(theta_1)-self.p2.m*self.g*sin(theta_1-2*theta_2)-2*sin(theta_1-theta_2)*self.p2.m*(omega_2**2*self.p2.L+omega_1**2*self.p1.L*cos(theta_1-theta_2))) / (self.p1.L*(2*self.p1.m+self.p2.m-self.p2.m*cos(2*theta_1-2*theta_2)))
+        dwdt_2 = (2*sin(theta_1-theta_2)*(omega_1**2*self.p1.L*(self.p1.m+self.p2.m)+self.g*(self.p1.m+self.p2.m)*cos(theta_1)+omega_2**2*self.p2.L*self.p2.m*cos(theta_1-theta_2))) / (self.p2.L*(2*self.p1.m+self.p2.m-self.p2.m*cos(2*theta_1-2*theta_2)))
 
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
@@ -52,62 +43,66 @@ class System():
     
     @staticmethod
     def normalize_angle(angle):
-        twopi = np.pi*2
-
-        while angle > np.pi:
-           angle -= twopi
+        while angle > pi:
+           angle -= 2*pi
         
-        while angle < -np.pi:
-           angle += twopi
+        while angle < -pi:
+           angle += 2*pi
 
-        return angle        
+        return angle    
 
+class Pendulum():
 
+    def __init__(self, length, mass, initial_angular_position, initial_angular_velocity, steps):
+        self.L = length
+        self.m = mass
+        self.angular_position = np.zeros(steps+1)
+        self.angular_velocity = np.zeros(steps+1)
+        self.angular_position[0] = initial_angular_position
+        self.angular_velocity[0] = initial_angular_velocity   
 
-class KineticEnergy1():
+class Energy():
 
-    def __init__(self, L1, m1):
-        self.L1 = L1
-        self.m1 = m1
-    
-    def __call__(self, omega1):
-        return self.m1/2*self.L1**2*omega1**2
-
-class KineticEnergy2():
-
-    def __init__(self, L1, L2, m2):
-        self.L1 = L1
-        self.L2 = L2
-        self.m2 = m2
-    
-    def __call__(self, theta1, omega1, theta2, omega2):
-        return self.m2/2*(self.L1**2*omega1**2+self.L2**2*omega2**2+2*self.L1*self.L2*omega1*omega2*np.cos(theta1-theta2))
-
-class PotentialEnergy1():
-
-    def __init__(self, L1, m1):
+    def __init__(self, length, mass):
         self.g = 9.8
-        self.L1 = L1
-        self.m1 = m1
+        self.L = length
+        self.m = mass
+class KineticEnergy1(Energy):
 
-    def __call__(self, theta1):
-        return self.m1*self.g*self.L1*(1-np.cos(theta1))
-
-class PotentialEnergy2():
-
-    def __init__(self, L1, L2, m2):
-        self.g = 9.8
-        self.L1 = L1
-        self.L2 = L2
-        self.m2 = m2
+    def __init__(self, length, mass):
+        super().__init__(length, mass)
     
-    def __call__(self, theta1, theta2):
-        return self.m2*self.g*(self.L1*(1-np.cos(theta1))+self.L2*(1-np.cos(theta2)))
+    def __call__(self, omega):
+        return self.m/2*self.L**2*omega**2
+class KineticEnergy2(Energy):
 
+    def __init__(self, length_1, length_2, mass):
+        super().__init__(length_1, mass)
+        self.L2 = length_2
+    
+    def __call__(self, theta_1, omega_1, theta_2, omega_2):
+        return self.m/2*(self.L**2*omega_1**2+self.L2**2*omega_2**2+2*self.L*self.L2*omega_1*omega_2*cos(theta_1-theta_2))
+
+class PotentialEnergy1(Energy):
+
+    def __init__(self, length, mass):
+        super().__init__(length, mass)
+
+    def __call__(self, theta):
+        return self.m*self.g*self.L*(1-cos(theta))
+
+class PotentialEnergy2(Energy):
+
+    def __init__(self, length_1, length_2, mass):
+        super().__init__(length_1, mass)
+        self.L2 = length_2
+         
+    def __call__(self, theta_1, theta_2):
+        return self.m*self.g*(self.L*(1-cos(theta_1))+self.L2*(1-cos(theta_2)))
 
 def plotting(pendulum, plot_energy=False):
-    plt.plot(pendulum.time, pendulum.angular_position_1, 'r-', label='angular_position_1')
-    plt.plot(pendulum.time, pendulum.angular_position_2, 'g-', label='angulat_position_2')
+    plt.plot(pendulum.time, pendulum.p1.angular_position, 'r-', label='angular_position_1')
+    plt.plot(pendulum.time, pendulum.p2.angular_position, 'g-', label='angulat_position_2')
     plt.legend()
     plt.show()
 

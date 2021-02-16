@@ -1,6 +1,6 @@
-from double_pendulum import Pendulum, System
+from double_pendulum import Pendulum, System, Energy, KineticEnergy1, KineticEnergy2, PotentialEnergy1, PotentialEnergy2
 import numpy as np
-from numpy import pi
+from numpy import pi, sin, cos
 from math import isclose
 
 def test_system_init():
@@ -34,6 +34,22 @@ def test_normalise_angle():
     assert isclose(System.normalize_angle(-pi), -pi)
     assert isclose(System.normalize_angle(-3*pi), -pi)
     assert isclose(System.normalize_angle(13*pi), -pi)
+
+def test_kineticenergy1():
+    kinetic = KineticEnergy1(2, 3)
+
+    assert kinetic.L == 2
+    assert kinetic.m == 3
+    assert kinetic(5) == 150
+
+def test_kineticenergy2():
+    length, length_2, mass, theta_1, omega_1, theta_2, omega_2 = 2, 3, 4, 5, 6, 7, 8
+    kinetic = KineticEnergy2(length, length_2, mass)
+
+    assert kinetic.L == 2
+    assert kinetic.L2 == 3
+    assert kinetic.m == 4
+    assert kinetic(theta_1, omega_1, theta_2, omega_2) == mass/2*(length**2*omega_1**2+length_2**2*omega_2**2+2*length*length_2*omega_1*omega_2*cos(theta_1-theta_2))
 
 '''
 def test_numerical_analysis():
