@@ -18,37 +18,40 @@ class System():
 
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
         self.g = 9.8
-        self.pendulum_1 = Pendulum(length_1, mass_1, initial_angular_position_1, initial_angular_velocity_1, steps)
-        self.pendulum_2 = Pendulum(length_2, mass_2, initial_angular_position_2, initial_angular_velocity_2, steps)
+        self.p1 = Pendulum(length_1, mass_1, initial_angular_position_1, initial_angular_velocity_1, steps)
+        self.p2 = Pendulum(length_2, mass_2, initial_angular_position_2, initial_angular_velocity_2, steps)
+        self.n = steps
         self.time = np.linspace(0, time, steps+1)
     
-    def linear_pendulum(self, parameters, t):
-        theta_1 = parameters[0]
-        omega_1 = parameters[1]
-        theta_2 = parameters[2]
-        omega_2 = parameters[3]
-        dwdt_1 = (-self.g*(2*self.m1+self.m2)*np.sin(theta_1)-self.m2*self.g*np.sin(theta_1-2*theta_2)-2*np.sin(theta_1-theta_2)*self.m2*(omega_2**2*self.L2+omega_1**2*self.L1*np.cos(theta_1-theta_2))) / (self.L1*(2*self.m1+self.m2-self.m2*np.cos(2*theta_1-2*theta_2)))
-        dwdt_2 = (2*np.sin(theta_1-theta_2)*(omega_1**2*self.L1*(self.m1+self.m2)+self.g*(self.m1+self.m2)*np.cos(theta_1)+omega_2**2*self.L2*self.m2*np.cos(theta_1-theta_2))) / (self.L2*(2*self.m1+self.m2-self.m2*np.cos(2*theta_1-2*theta_2)))
+    def model(self, initial_conditions, t):
+        theta_1 = initial_conditions[0]
+        omega_1 = initial_conditions[1]
+        theta_2 = initial_conditions[2]
+        omega_2 = initial_conditions[3]
+        dwdt_1 = (-self.g*(2*self.p1.m+self.p2.m)*np.sin(theta_1)-self.p2.m*self.g*np.sin(theta_1-2*theta_2)-2*np.sin(theta_1-theta_2)*self.p2.m*(omega_2**2*self.p2.L+omega_1**2*self.p1.L*np.cos(theta_1-theta_2))) / (self.p1.L*(2*self.p1.m+self.p2.m-self.p2.m*np.cos(2*theta_1-2*theta_2)))
+        dwdt_2 = (2*np.sin(theta_1-theta_2)*(omega_1**2*self.p1.L*(self.p1.m+self.p2.m)+self.g*(self.p1.m+self.p2.m)*np.cos(theta_1)+omega_2**2*self.p2.L*self.p2.m*np.cos(theta_1-theta_2))) / (self.p2.L*(2*self.p1.m+self.p2.m-self.p2.m*np.cos(2*theta_1-2*theta_2)))
 
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
     def numerical_analysis(self):
         for i in range(1, self.n+1):
-            parameters = odeint(self.linear_pendulum, [self.angular_position_1[i-1], self.angular_velocity_1[i-1], self.angular_position_2[i-1], self.angular_velocity_2[i-1]], self.time[i-1: i+1])
-            theta1 = parameters[1, 0]
-            omega1 = parameters[1, 1]
-            theta2 = parameters[1, 2]
-            omega2 = parameters[1, 3]
+            output = odeint(
+                self.model, 
+                [self.p1.angular_position[i-1], self.p1.angular_velocity[i-1], self.p2.angular_position[i-1], self.p2.angular_velocity[i-1]], 
+                self.time[i-1: i+1]
+                )
+            theta_1 = output[1, 0]
+            omega_1 = output[1, 1]
+            theta_2 = output[1, 2]
+            omega_2 = output[1, 3]
         
-            self.angular_position_1[i] = self.normalize_angle(theta1)
-            self.angular_velocity_1[i] = omega1
-            self.angular_position_2[i] = self.normalize_angle(theta2)
-            self.angular_velocity_2[i] = omega2
-            self.kinetic_energy[i] = self.K1(omega1) + self.K2(theta1, omega1, theta2, omega2)
-            self.potential_energy[i] = self.P1(theta1) + self.P2(theta1, theta2)
-            self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i]
+            self.p1.angular_position[i] = self.normalize_angle(theta_1)
+            self.p1.angular_velocity[i] = omega_1
+            self.p2.angular_position[i] = self.normalize_angle(theta_2)
+            self.p2.angular_velocity[i] = omega_2
     
-    def normalize_angle(self, angle):
+    @staticmethod
+    def normalize_angle(angle):
         twopi = np.pi*2
 
         while angle > np.pi:
