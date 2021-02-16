@@ -6,36 +6,22 @@ import matplotlib.pyplot as plt
 
 class Pendulum():
 
-    def __init__(self, length_1, length_2, mass_1, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, time, steps):
-        self.n = steps
+    def __init__(self, length, mass, initial_angular_position, initial_angular_velocity, steps):
+        self.L = length
+        self.m = mass
+        self.angular_position = np.zeros(steps+1)
+        self.angular_velocity = np.zeros(steps+1)
+        self.angular_position[0] = initial_angular_position
+        self.angular_velocity[0] = initial_angular_velocity
+
+class System():
+
+    def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
         self.g = 9.8
-        self.L1 = length_1
-        self.L2 = length_2
-        self.m1 = mass_1
-        self.m2 = mass_2
+        self.pendulum_1 = Pendulum(length_1, mass_1, initial_angular_position_1, initial_angular_velocity_1, steps)
+        self.pendulum_2 = Pendulum(length_2, mass_2, initial_angular_position_2, initial_angular_velocity_2, steps)
         self.time = np.linspace(0, time, steps+1)
-        self.K1 = KineticEnergy1(length_1, mass_1)
-        self.K2 = KineticEnergy2(length_1, length_2, mass_2)
-        self.P1 = PotentialEnergy1(length_1, mass_1)
-        self.P2 = PotentialEnergy2(length_1, length_2, mass_2)
     
-        self.angular_position_1 = np.zeros((len(self.time)))
-        self.angular_velocity_1 = np.zeros((len(self.time)))
-        self.angular_position_2 = np.zeros((len(self.time)))
-        self.angular_velocity_2 = np.zeros((len(self.time)))
-        self.kinetic_energy = np.zeros((len(self.time)))
-        self.potential_energy = np.zeros((len(self.time)))
-        self.total_energy = np.zeros((len(self.time)))
-        self.angular_position_1[0] = initial_angular_position_1
-        self.angular_velocity_1[0] = initial_angular_velocity_1
-        self.angular_position_2[0] = initial_angular_position_2
-        self.angular_velocity_2[0] = initial_angular_velocity_2
-        self.kinetic_energy[0] = self.K1(initial_angular_velocity_1) + self.K2(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2)
-        self.potential_energy[0] = self.P1(initial_angular_position_1) + self.P2(initial_angular_position_1, initial_angular_position_2)
-        self.total_energy[0] = self.kinetic_energy[0] + self.potential_energy[0]
-
-        self.numerical_analysis()
-
     def linear_pendulum(self, parameters, t):
         theta_1 = parameters[0]
         omega_1 = parameters[1]
@@ -44,8 +30,7 @@ class Pendulum():
         dwdt_1 = (-self.g*(2*self.m1+self.m2)*np.sin(theta_1)-self.m2*self.g*np.sin(theta_1-2*theta_2)-2*np.sin(theta_1-theta_2)*self.m2*(omega_2**2*self.L2+omega_1**2*self.L1*np.cos(theta_1-theta_2))) / (self.L1*(2*self.m1+self.m2-self.m2*np.cos(2*theta_1-2*theta_2)))
         dwdt_2 = (2*np.sin(theta_1-theta_2)*(omega_1**2*self.L1*(self.m1+self.m2)+self.g*(self.m1+self.m2)*np.cos(theta_1)+omega_2**2*self.L2*self.m2*np.cos(theta_1-theta_2))) / (self.L2*(2*self.m1+self.m2-self.m2*np.cos(2*theta_1-2*theta_2)))
 
-        return [omega_1, dwdt_1, omega_2, dwdt_2]
-    
+        return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
     def numerical_analysis(self):
         for i in range(1, self.n+1):
@@ -73,6 +58,8 @@ class Pendulum():
            angle += twopi
 
         return angle        
+
+
 
 class KineticEnergy1():
 
@@ -138,6 +125,4 @@ def print_data(pendulum):
     pendulum_data.index.name = 'Step'
     print(pendulum_data)
 
-pendulum = Pendulum(1, 1, 1, 1, np.pi/2, 0, np.pi/4, 0, 100, 1000)
-plotting(pendulum, plot_energy=True)
 
