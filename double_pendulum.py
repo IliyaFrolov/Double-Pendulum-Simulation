@@ -11,9 +11,20 @@ class System():
         self.g = 9.8
         self.p1 = Pendulum(length_1, mass_1, initial_angular_position_1, initial_angular_velocity_1, steps)
         self.p2 = Pendulum(length_2, mass_2, initial_angular_position_2, initial_angular_velocity_2, steps)
+        self.p1.K = KineticEnergy1(length_1, mass_1)
+        self.p1.U = PotentialEnergy1(length_1, mass_1)
+        self.p2.K = KineticEnergy2(length_1, length_2, mass_2)
+        self.p2.U = PotentialEnergy2(length_1, length_2, mass_2)
         self.n = steps
         self.time = np.linspace(0, time, steps+1)
-    
+        self.kinetic_energy = np.zeros(steps+1)
+        self.potential_energy = np.zeros(steps+1)
+        self.total_energy = np.zeros(steps+1)
+
+        self.kinetic_energy[0] = self.p1.K(initial_angular_velocity_1) + self.p2.K(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2)
+        self.potential_energy[0] = self.p1.U(initial_angular_position_1) + self.p2.U(initial_angular_position_1, initial_angular_position_2)
+        self.total_energy[0] = self.kinetic_energy[0] + self.potential_energy[0]
+
     def model(self, initial_conditions, t):
         theta_1 = initial_conditions[0]
         omega_1 = initial_conditions[1]
@@ -40,6 +51,9 @@ class System():
             self.p1.angular_velocity[i] = omega_1
             self.p2.angular_position[i] = self.normalize_angle(theta_2)
             self.p2.angular_velocity[i] = omega_2
+            self.kinetic_energy[i] =  self.p1.K(omega_1) + self.p2.K(theta_1, omega_1, theta_2, omega_2)
+            self.potential_energy[i] = self.p1.U(theta_1) + self.p2.U(theta_1, theta_2)
+            self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
     
     @staticmethod
     def normalize_angle(angle):
@@ -60,7 +74,7 @@ class Pendulum():
         self.angular_velocity = np.zeros(steps+1)
         self.angular_position[0] = initial_angular_position
         self.angular_velocity[0] = initial_angular_velocity   
-
+      
 class Energy():
 
     def __init__(self, length, mass):
@@ -76,8 +90,8 @@ class KineticEnergy1(Energy):
         return self.m/2*self.L**2*omega**2
 class KineticEnergy2(Energy):
 
-    def __init__(self, length_1, length_2, mass):
-        super().__init__(length_1, mass)
+    def __init__(self, length_1, length_2, mass_2):
+        super().__init__(length_1, mass_2)
         self.L2 = length_2
     
     def __call__(self, theta_1, omega_1, theta_2, omega_2):
@@ -93,14 +107,15 @@ class PotentialEnergy1(Energy):
 
 class PotentialEnergy2(Energy):
 
-    def __init__(self, length_1, length_2, mass):
-        super().__init__(length_1, mass)
+    def __init__(self, length_1, length_2, mass_2):
+        super().__init__(length_1, mass_2)
         self.L2 = length_2
          
     def __call__(self, theta_1, theta_2):
         return self.m*self.g*(self.L*(1-cos(theta_1))+self.L2*(1-cos(theta_2)))
 
 def plotting(pendulum, plot_energy=False):
+    pendulum.numerical_analysis()
     plt.plot(pendulum.time, pendulum.p1.angular_position, 'r-', label='angular_position_1')
     plt.plot(pendulum.time, pendulum.p2.angular_position, 'g-', label='angulat_position_2')
     plt.legend()
@@ -122,5 +137,8 @@ def print_data(pendulum):
 
     pendulum_data.index.name = 'Step'
     print(pendulum_data)
+
+#pendulum = System(1, 1, 1, 1, np.pi/2, 0, np.pi/2, 0, 1000, 50)
+#plotting(pendulum, True)
 
 
