@@ -1,4 +1,4 @@
-from double_pendulum import Pendulum, System, Energy, KineticEnergy1, KineticEnergy2, PotentialEnergy1, PotentialEnergy2
+from double_pendulum import Pendulum, System, EquationTerms, KineticEnergy, PotentialEnergy, Acceleration
 import numpy as np
 import pytest
 from numpy import pi, sin, cos
@@ -23,15 +23,20 @@ def test_system_init():
     assert system.p1.m == mass_1 
     assert len(system.p1.angular_position) == steps+1
     assert len(system.p1.angular_velocity) == steps+1
+    assert len(system.p1.angular_acceleration) == steps+1
     assert system.p1.angular_position[0] == inital_angluar_position_1
     assert system.p1.angular_velocity[0] == inital_angluar_velocity_1
+    assert system.p1.angular_acceleration[0] == system.p1.dwdt(inital_angluar_position_1, inital_angluar_velocity_1, inital_angluar_position_2, inital_angluar_velocity_2)
+
 
     assert system.p2.L == length_2
     assert system.p2.m == mass_2
     assert len(system.p2.angular_position) == steps+1
     assert len(system.p2.angular_velocity) == steps+1
+    assert len(system.p2.angular_acceleration) == steps+1
     assert system.p2.angular_position[0] == inital_angluar_position_2
     assert system.p2.angular_velocity[0] == inital_angluar_velocity_2
+    assert system.p2.angular_acceleration[0] == system.p2.dwdt(inital_angluar_position_1, inital_angluar_velocity_1, inital_angluar_position_2, inital_angluar_velocity_2)
 
 @pytest.mark.parametrize('angle, expected', [
     (pi/2, pi/2), (pi, pi),
@@ -42,42 +47,34 @@ def test_system_init():
 def test_normalise_angle(angle, expected):
     assert isclose(System.normalize_angle(angle), expected)
 
-@pytest.mark.parametrize('length_1, length_2, mass, theta_1, omega_1, theta_2, omega_2', [
-    (2, 3, 4, pi, pi/2, pi/4, 2*pi), 
-    (4, 4, 3, 5*pi, 0, pi/2, 6),
-    (0, 1, 10, 4, 3*pi, 0, 2)
+@pytest.mark.parametrize('length_1, mass_1, length_2, mass_2, theta_1, omega_1, theta_2, omega_2', [
+    (2, 3, 4, 5, pi, pi/2, pi/4, 2*pi), 
+    (4, 4, 3, 1, 5*pi, 0, pi/2, 6),
+    (0, 1, 10, 4, 2, 3*pi, 0, 2)
 ])
-class Test():
+class TestEnergy():
 
-    def test_kineticenergy1(self, length_1, length_2, mass, theta_1, omega_1, theta_2, omega_2):
-        kinetic = KineticEnergy1(length_1, mass)
+    def test_kineticenergy(self, length_1, mass_1, length_2, mass_2, theta_1, omega_1, theta_2, omega_2):
+        kinetic_1 = KineticEnergy(length_1, mass_1, length_2, mass_2, 1)
+        kinetic_2 = KineticEnergy(length_1, mass_1, length_2, mass_2, 2)
 
-        assert kinetic.L == length_1
-        assert kinetic.m == mass
-        assert kinetic(omega_1) == mass/2*length_1**2*omega_1**2
+        assert kinetic_1.L1 == length_1
+        assert kinetic_1.m1 == mass_1
+        assert kinetic_1.L2 == length_2
+        assert kinetic_1.m2 == mass_2
+        assert kinetic_1(theta_1, omega_1, theta_2, omega_2) == mass_1/2*length_1**2*omega_1**2
+        assert kinetic_2(theta_1, omega_1, theta_2, omega_2) == mass_1/2*(length_1**2*omega_1**2+length_2**2*omega_2**2+2*length_1*length_2*omega_1*omega_2*cos(theta_1-theta_2))
 
-    def test_kineticenergy2(self, length_1, length_2, mass, theta_1, omega_1, theta_2, omega_2):
-        kinetic = KineticEnergy2(length_1, length_2, mass)
+    def test_potentialenergy(self, length_1, mass_1, length_2, mass_2, theta_1, omega_1, theta_2, omega_2):
+        potential_1 = PotentialEnergy(length_1, mass_1, length_2, mass_2, 1)
+        potential_2 = PotentialEnergy(length_1, mass_1, length_2, mass_2, 2)
 
-        assert kinetic.L == length_1
-        assert kinetic.L2 == length_2
-        assert kinetic.m == mass
-        assert kinetic(theta_1, omega_1, theta_2, omega_2) == mass/2*(length_1**2*omega_1**2+length_2**2*omega_2**2+2*length_1*length_2*omega_1*omega_2*cos(theta_1-theta_2))
-
-    def test_potentialenergy1(self, length_1, length_2, mass, theta_1, omega_1, theta_2, omega_2):
-        potential = PotentialEnergy1(length_1, mass)
-
-        assert potential.L == length_1
-        assert potential.m == mass
-        assert potential(theta_1) == mass*9.8*length_1*(1-cos(theta_1))
-
-    def test_potentialenergy2(self, length_1, length_2, mass, theta_1, omega_1, theta_2, omega_2):
-        potential = PotentialEnergy2(length_1, length_2, mass)
-
-        assert potential.L == length_1
-        assert potential.L2 == length_2
-        assert potential.m == mass
-        assert potential(theta_1, theta_2) == mass*9.8*(length_1*(1-cos(theta_1))+length_2*(1-cos(theta_2)))
+        assert potential_1.L1 == length_1
+        assert potential_1.m1 == mass_1
+        assert potential_1.L2 == length_2
+        assert potential_1.m2 == mass_2
+        assert potential_1(theta_1, theta_2) == mass_1*9.8*length_1*(1-cos(theta_1))
+        assert potential_2(theta_1, theta_2) == mass_1*9.8*(length_1*(1-cos(theta_1))+length_2*(1-cos(theta_2)))
 
 
 '''
