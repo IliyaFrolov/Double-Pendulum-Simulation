@@ -1,7 +1,6 @@
-from double_pendulum import Pendulum, System, EquationTerms, KineticEnergy, PotentialEnergy, Acceleration
-import numpy as np
+from system import System, Pendulum
+from equations import *
 import pytest
-from numpy import pi, sin, cos
 from math import isclose
 
 def test_system_init():
