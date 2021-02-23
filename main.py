@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
+from matplotlib import animation 
 import pandas as pd
-from system import System, np
+from system import System, np, pi
 
 def plotting(pendulum, plot_energy=False):
     plt.plot(pendulum['Time'], pendulum['Angular position 1'], 'r-', label='angular_position_1')
@@ -31,6 +32,32 @@ def pandas_data(pendulum):
 
     return pendulum_data
 
-pendulum = System(1, 1, 1, 1, np.pi/2, 0, np.pi, 0, 1000, 50)
+pendulum = System(1, 1, 1, 1, pi/2, 0, pi/4, 0, 1000, 50)
 pendulum.numerical_analysis()
-plotting(pandas_data(pendulum), True)
+
+fig = plt.figure()
+ax = plt.axes(xlim=(0, 100), ylim=(-2*pi, 2*pi))
+line1, = ax.plot([], [])
+line2, = ax.plot([], [])
+
+def init():
+    line1.set_data([], [])
+    line2.set_data([], [])
+    return line1, line2,
+
+def animate(i):
+    x = pendulum.time[:i]
+    y1 = pendulum.p1.angular_position[:i]
+    y2 = pendulum.p2.angular_position[:i]
+    line1.set_data(x, y1)
+    line2.set_data(x, y2)   
+    return line1, line2,
+
+anim = animation.FuncAnimation(fig, animate, init_func=init,
+                               frames=1000, interval=20, blit=True)
+
+
+anim.save('basic_animation.gif')
+
+plt.show()
+    
