@@ -20,9 +20,13 @@ def pandas_data(pendulum):
     pendulum_data = pd.DataFrame({
     'Time': pendulum.time,
     'Angular position 1': pendulum.p1.angular_position,
+    'x position 1': pendulum.p1.x_position,
+    'y position 1': pendulum.p1.y_position,
     'Angular velocity 1': pendulum.p1.angular_velocity,
     'Angular acceleration 1': pendulum.p1.angular_acceleration,
     'Angular position 2': pendulum.p2.angular_position,
+    'x position 2': pendulum.p2.x_position,
+    'y position 2': pendulum.p2.y_position,
     'Angular velocity 2': pendulum.p2.angular_velocity,
     'Angular acceleration 2': pendulum.p2.angular_acceleration,
     'Kinetic energy': pendulum.kinetic_energy,
@@ -34,24 +38,24 @@ def pandas_data(pendulum):
 
 pendulum = System(1, 1, 1, 1, pi/2, 0, pi/4, 0, 1000, 50)
 pendulum.numerical_analysis()
+pendulum_data = pandas_data(pendulum)
 
 fig = plt.figure()
-ax = plt.axes(xlim=(0, 100), ylim=(-2*pi, 2*pi))
-line1, = ax.plot([], [])
-line2, = ax.plot([], [])
+ax = plt.axes(xlim=(-2, 2), ylim=(-2, 2))
+line, = ax.plot([], [], 'o-')
 
 def init():
-    line1.set_data([], [])
-    line2.set_data([], [])
-    return line1, line2,
+    line.set_data([], [])
+    return line,
 
 def animate(i):
-    x = pendulum.time[:i]
-    y1 = pendulum.p1.angular_position[:i]
-    y2 = pendulum.p2.angular_position[:i]
-    line1.set_data(x, y1)
-    line2.set_data(x, y2)   
-    return line1, line2,
+    x1 = pendulum_data['x position 1'][i]
+    y1 = pendulum_data['y position 1'][i]
+    x2 = pendulum_data['x position 2'][i]
+    y2 = pendulum_data['y position 2'][i]
+    line.set_data([0, x1, x2], [0, y1, y2])
+   
+    return line,
 
 anim = animation.FuncAnimation(fig, animate, init_func=init,
                                frames=1000, interval=20, blit=True)

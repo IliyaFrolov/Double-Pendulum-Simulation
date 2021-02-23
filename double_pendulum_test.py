@@ -2,6 +2,7 @@ from system import System, Pendulum
 from equations import *
 import pytest
 from math import isclose
+from numpy import sqrt
 
 def test_system_init():
     length_1, mass_1, length_2, mass_2 = 1, 5, 2, 4
@@ -21,6 +22,8 @@ def test_system_init():
     assert system.p1.L == length_1
     assert system.p1.m == mass_1 
     assert len(system.p1.angular_position) == steps+1
+    assert len(system.p1.x_position) == steps+1
+    assert len(system.p1.y_position) == steps+1
     assert len(system.p1.angular_velocity) == steps+1
     assert len(system.p1.angular_acceleration) == steps+1
     assert system.p1.angular_position[0] == inital_angluar_position_1
@@ -31,6 +34,8 @@ def test_system_init():
     assert system.p2.L == length_2
     assert system.p2.m == mass_2
     assert len(system.p2.angular_position) == steps+1
+    assert len(system.p2.x_position) == steps+1
+    assert len(system.p2.y_position) == steps+1
     assert len(system.p2.angular_velocity) == steps+1
     assert len(system.p2.angular_acceleration) == steps+1
     assert system.p2.angular_position[0] == inital_angluar_position_2
@@ -45,6 +50,17 @@ def test_system_init():
     ])
 def test_normalise_angle(angle, expected):
     assert isclose(System.normalize_angle(angle), expected)
+
+@pytest.mark.parametrize('length, angle ,x_expected, y_expected', [
+    (5, pi/4, 5*sqrt(2)/2, -5*sqrt(2)/2),
+    (3, 3*pi, 0, 3),
+    (7, -19/4*pi, -7*sqrt(2)/2, 7*sqrt(2)/2)
+])
+def test_polar_to_cartesian(length, angle, x_expected, y_expected):
+    convert = Polar_to_Cartesian(length)
+    
+    assert round(convert(angle, 'x'), 3) == round(x_expected , 3)
+    assert round(convert(angle, 'y'), 3) == round(y_expected, 3)
 
 @pytest.mark.parametrize('length_1, mass_1, length_2, mass_2, theta_1, omega_1, theta_2, omega_2', [
     (2, 3, 4, 5, pi, pi/2, pi/4, 2*pi), 

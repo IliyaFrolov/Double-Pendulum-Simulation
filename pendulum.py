@@ -6,6 +6,8 @@ class Pendulum():
         self.L = length
         self.m = mass
         self.angular_position = np.zeros(steps+1)
+        self.x_position = np.zeros(steps+1)
+        self.y_position = np.zeros(steps+1)
         self.angular_velocity = np.zeros(steps+1)
         self.angular_acceleration = np.zeros(steps+1)
         self.angular_position[0] = initial_angular_position

@@ -1,5 +1,20 @@
 from numpy import sin, cos, pi
 
+class Polar_to_Cartesian():
+
+    def __init__(self, length):
+        self.L = length
+
+    def __call__(self, theta, coordinate):
+        if coordinate == 'x':
+            return self.L*cos(theta-pi/2)
+
+        elif coordinate == 'y':
+            return self.L*sin(theta-pi/2)
+        
+        else:
+            raise Exception('Parameter "coordinate" must be either "x" or "y".')
+
 class EquationTerms():
 
     def __init__(self, length_1, mass_1, length_2, mass_2, pendulum_bob):

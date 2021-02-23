@@ -8,6 +8,8 @@ class System():
         self.g = 9.8
         self.p1 = Pendulum(length_1, mass_1, initial_angular_position_1, initial_angular_velocity_1, steps)
         self.p2 = Pendulum(length_2, mass_2, initial_angular_position_2, initial_angular_velocity_2, steps)
+        self.p1.convert = Polar_to_Cartesian(length_1)
+        self.p2.convert = Polar_to_Cartesian(length_2)
         self.p1.dwdt = Acceleration(length_1, mass_1, length_2, mass_2, 1)
         self.p2.dwdt = Acceleration(length_1, mass_1, length_2, mass_2, 2)
         self.p1.K = KineticEnergy(length_1, mass_1, length_2, mass_2, 1)
@@ -49,9 +51,13 @@ class System():
             omega_2 = output[1, 3]
         
             self.p1.angular_position[i] = self.normalize_angle(theta_1)
+            self.p1.x_position[i] = self.p1.convert(theta_1, 'x')
+            self.p1.y_position[i] = self.p1.convert(theta_1, 'y')
             self.p1.angular_velocity[i] = omega_1
             self.p1.angular_acceleration[i] = self.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
             self.p2.angular_position[i] = self.normalize_angle(theta_2)
+            self.p2.x_position[i] = self.p1.convert(theta_2, 'x') + self.p1.x_position[i]
+            self.p2.y_position[i] = self.p1.convert(theta_2, 'y') + self.p1.y_position[i]
             self.p2.angular_velocity[i] = omega_2
             self.p2.angular_acceleration[i] = self.p2.dwdt(theta_1, omega_1, theta_2, omega_2)
             self.kinetic_energy[i] =  self.p1.K(theta_1, omega_1, theta_2, omega_2) + self.p2.K(theta_1, omega_1, theta_2, omega_2)
