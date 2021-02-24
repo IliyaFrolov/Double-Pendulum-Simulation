@@ -1,3 +1,4 @@
+import pandas as pd
 from equations import *
 from pendulum import Pendulum, np
 from scipy.integrate import odeint
@@ -38,7 +39,7 @@ class System():
 
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
-    def numerical_analysis(self):
+    def run_simulation(self):
         for i in range(1, self.n+1):
             output = odeint(
                 self.model, 
@@ -56,13 +57,33 @@ class System():
             self.p1.angular_velocity[i] = omega_1
             self.p1.angular_acceleration[i] = self.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
             self.p2.angular_position[i] = self.normalize_angle(theta_2)
-            self.p2.x_position[i] = self.p1.convert(theta_2, 'x') + self.p1.x_position[i]
-            self.p2.y_position[i] = self.p1.convert(theta_2, 'y') + self.p1.y_position[i]
+            self.p2.x_position[i] = self.p1.x_position[i] + self.p1.convert(theta_2, 'x')
+            self.p2.y_position[i] = self.p1.y_position[i] + self.p1.convert(theta_2, 'y') 
             self.p2.angular_velocity[i] = omega_2
             self.p2.angular_acceleration[i] = self.p2.dwdt(theta_1, omega_1, theta_2, omega_2)
             self.kinetic_energy[i] =  self.p1.K(theta_1, omega_1, theta_2, omega_2) + self.p2.K(theta_1, omega_1, theta_2, omega_2)
             self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_1, theta_2)
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
+    
+    def make_data(self):
+        self.run_simulation()
+
+        return pd.DataFrame({
+        'Time': self.time,
+        'Angular position 1': self.p1.angular_position,
+        'x position 1': self.p1.x_position,
+        'y position 1': self.p1.y_position,
+        'Angular velocity 1': self.p1.angular_velocity,
+        'Angular acceleration 1': self.p1.angular_acceleration,
+        'Angular position 2': self.p2.angular_position,
+        'x position 2': self.p2.x_position,
+        'y position 2': self.p2.y_position,
+        'Angular velocity 2': self.p2.angular_velocity,
+        'Angular acceleration 2': self.p2.angular_acceleration,
+        'Kinetic energy': self.kinetic_energy,
+        'Potential energy': self.potential_energy,
+        'Total energy': self.total_energy
+        })
     
     @staticmethod
     def normalize_angle(angle):

@@ -37,7 +37,7 @@ class Acceleration(EquationTerms):
         if self.pendulum_bob == 1:
             return (-self.g*(2*self.m1+self.m2)*sin(theta_1)-self.m2*self.g*sin(theta_1-2*theta_2)-2*sin(theta_1-theta_2)*self.m2*(omega_2**2*self.L2+omega_1**2*self.L1*cos(theta_1-theta_2))) / (self.L1*(2*self.m1+self.m2-self.m2*cos(2*theta_1-2*theta_2)))
 
-        elif self.pendulum_bob == 2:
+        else:
             return (2*sin(theta_1-theta_2)*(omega_1**2*self.L1*(self.m1+self.m2)+self.g*(self.m1+self.m2)*cos(theta_1)+omega_2**2*self.L2*self.m2*cos(theta_1-theta_2))) / (self.L2*(2*self.m1+self.m2-self.m2*cos(2*theta_1-2*theta_2)))
         
 
@@ -50,7 +50,7 @@ class KineticEnergy(EquationTerms):
         if self.pendulum_bob == 1:
             return self.m1/2*self.L1**2*omega_1**2
         
-        elif self.pendulum_bob == 2:
+        else:
             return self.m1/2*(self.L1**2*omega_1**2+self.L2**2*omega_2**2+2*self.L1*self.L2*omega_1*omega_2*cos(theta_1-theta_2))
 
 class PotentialEnergy(EquationTerms):
@@ -62,7 +62,7 @@ class PotentialEnergy(EquationTerms):
         if self.pendulum_bob == 1:
             return self.m1*self.g*self.L1*(1-cos(theta_1))  
         
-        elif self.pendulum_bob == 2:
+        else:
             return self.m1*self.g*(self.L1*(1-cos(theta_1))+self.L2*(1-cos(theta_2)))
         
     

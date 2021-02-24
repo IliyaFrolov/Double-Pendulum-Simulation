@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 from matplotlib import animation 
-import pandas as pd
-from system import System, np, pi
+from system import System, np, pi, pd
 
-def plotting(pendulum, plot_energy=False):
+def plot_data(pendulum, plot_energy=False):
     plt.plot(pendulum['Time'], pendulum['Angular position 1'], 'r-', label='angular_position_1')
     plt.plot(pendulum['Time'], pendulum['Angular position 2'], 'g-', label='angular_position_2')
     plt.legend()
@@ -14,31 +13,16 @@ def plotting(pendulum, plot_energy=False):
         plt.plot(pendulum['Time'], pendulum['Potential energy'], 'g-', label='potential')
         plt.plot(pendulum['Time'], pendulum['Total energy'], 'r-,', label='total energy')
         plt.legend()
-        plt.show() 
+        plt.show()
 
-def pandas_data(pendulum):
-    pendulum_data = pd.DataFrame({
-    'Time': pendulum.time,
-    'Angular position 1': pendulum.p1.angular_position,
-    'x position 1': pendulum.p1.x_position,
-    'y position 1': pendulum.p1.y_position,
-    'Angular velocity 1': pendulum.p1.angular_velocity,
-    'Angular acceleration 1': pendulum.p1.angular_acceleration,
-    'Angular position 2': pendulum.p2.angular_position,
-    'x position 2': pendulum.p2.x_position,
-    'y position 2': pendulum.p2.y_position,
-    'Angular velocity 2': pendulum.p2.angular_velocity,
-    'Angular acceleration 2': pendulum.p2.angular_acceleration,
-    'Kinetic energy': pendulum.kinetic_energy,
-    'Potential energy': pendulum.potential_energy,
-    'Total energy': pendulum.total_energy
-    })
+def save_data(data, file_name):
+    data.to_pickle(rf'C:\Users\Iliya Frolov\OneDrive\PHYS 389\modelling\{file_name}')
 
-    return pendulum_data
+def fetch_data(file_name):
+    return pd.read_pickle(rf'C:\Users\Iliya Frolov\OneDrive\PHYS 389\modelling\{file_name}')
 
 pendulum = System(1, 1, 1, 1, pi/2, 0, pi/4, 0, 1000, 50)
-pendulum.numerical_analysis()
-pendulum_data = pandas_data(pendulum)
+pendulum_data = fetch_data('pendulum data')
 
 fig = plt.figure()
 ax = plt.axes(xlim=(-2, 2), ylim=(-2, 2))
@@ -57,11 +41,8 @@ def animate(i):
    
     return line,
 
-anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=1000, interval=20, blit=True)
+anim = animation.FuncAnimation(fig, animate, init_func=init, frames=1000, interval=20, blit=True)
 
-
-anim.save('basic_animation.gif')
-
-plt.show()
+#anim.save('basic_animation.gif')
+#plt.show()
     
