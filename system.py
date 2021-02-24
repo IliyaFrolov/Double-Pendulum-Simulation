@@ -2,6 +2,8 @@ import pandas as pd
 from equations import *
 from pendulum import Pendulum, np
 from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+from matplotlib import animation 
 
 class System():
 
@@ -94,3 +96,48 @@ class System():
            angle += 2*pi
 
         return angle  
+
+def plot_data(pendulum_data, plot_energy=False):
+    plt.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='angular_position_1')
+    plt.plot(pendulum_data['Time'], pendulum_data['Angular position 2'], 'g-', label='angular_position_2')
+    plt.legend()
+    plt.show()
+
+    if plot_energy:
+        plt.plot(pendulum_data['Time'], pendulum_data['Kinetic energy'], 'b-', label='kinetic')
+        plt.plot(pendulum_data['Time'], pendulum_data['Potential energy'], 'g-', label='potential')
+        plt.plot(pendulum_data['Time'], pendulum_data['Total energy'], 'r-,', label='total energy')
+        plt.legend()
+        plt.show()
+
+def make_animation(pendulum_data, save=False):
+    fig = plt.figure()
+    ax = plt.axes(xlim=(-2, 2), ylim=(-2, 2))
+    line, = ax.plot([], [], 'o-')
+
+    def init():
+        line.set_data([], [])
+        return line,
+
+    def animate(i):
+        x1 = pendulum_data['x position 1'][i]
+        y1 = pendulum_data['y position 1'][i]
+        x2 = pendulum_data['x position 2'][i]
+        y2 = pendulum_data['y position 2'][i]
+        line.set_data([0, x1, x2], [0, y1, y2])
+    
+        return line,
+
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=1000, interval=20, blit=True)
+    plt.show()
+
+    if save:
+        file_name = input('Enter file name:')
+        anim.save(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}.gif')
+
+def save_data(data, file_name):
+    data.to_pickle(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}')
+
+def fetch_data(file_name):
+    return pd.read_pickle(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}')
+    
