@@ -41,13 +41,13 @@ class System():
 
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
-    def run_simulation(self):
+    def run_simulation(self, method):
         for i in range(1, self.n+1):
             output = solve_ivp(
                 self.model, 
                 self.time[i-1: i+1],
                 [self.p1.angular_position[i-1], self.p1.angular_velocity[i-1], self.p2.angular_position[i-1], self.p2.angular_velocity[i-1]], 
-                t_eval=np.linspace(self.time[i-1], self.time[i], 2)
+                t_eval=np.linspace(self.time[i-1], self.time[i], 2), method=method
                 ).y
             
             theta_1 = output[0][1]
@@ -69,8 +69,8 @@ class System():
             self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_1, theta_2)
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
     
-    def make_data(self):
-        self.run_simulation()
+    def make_data(self, method='RK45'):
+        self.run_simulation(method)
 
         return pd.DataFrame({
         'Time': self.time,
@@ -99,17 +99,24 @@ class System():
 
         return angle  
 
-def plot_data(pendulum_data, plot_energy=False):
-    plt.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='angular_position_1')
-    plt.plot(pendulum_data['Time'], pendulum_data['Angular position 2'], 'g-', label='angular_position_2')
-    plt.legend()
-    plt.show()
+def make_plot(pendulum_data, plot_energy=False, save=False, file_name=None):
+    fig = plt.figure()
+    position_ax = fig.add_subplot(121)
+    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='angular_position_1')
+    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 2'], 'g-', label='angular_position_2')
+    position_ax.legend()
 
     if plot_energy:
-        plt.plot(pendulum_data['Time'], pendulum_data['Kinetic energy'], 'b-', label='kinetic')
-        plt.plot(pendulum_data['Time'], pendulum_data['Potential energy'], 'g-', label='potential')
-        plt.plot(pendulum_data['Time'], pendulum_data['Total energy'], 'r-,', label='total energy')
+        energy_ax = fig.add_subplot(122)
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Kinetic energy'], 'b-', label='kinetic')
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Potential energy'], 'g-', label='potential')
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Total energy'], 'r-,', label='total energy')
         plt.legend()
+    
+    if save:
+        plt.savefig(f'{file_name}.png')
+    
+    else:
         plt.show()
 
 def make_animation(pendulum_data, save=False):
