@@ -1,7 +1,7 @@
 import pandas as pd
 from equations import *
 from pendulum import Pendulum, np
-from scipy.integrate import odeint
+from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 from matplotlib import animation 
 
@@ -31,7 +31,7 @@ class System():
         self.potential_energy[0] = self.p1.U(initial_angular_position_1, initial_angular_position_2) + self.p2.U(initial_angular_position_1, initial_angular_position_2)
         self.total_energy[0] = self.kinetic_energy[0] + self.potential_energy[0]
 
-    def model(self, initial_conditions, t):
+    def model(self, t, initial_conditions):
         theta_1 = initial_conditions[0]
         omega_1 = initial_conditions[1]
         theta_2 = initial_conditions[2]
@@ -41,17 +41,19 @@ class System():
 
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
-    def run_simulation(self):
+    def run_simulation(self, method):
         for i in range(1, self.n+1):
-            output = odeint(
+            output = solve_ivp(
                 self.model, 
+                self.time[i-1: i+1],
                 [self.p1.angular_position[i-1], self.p1.angular_velocity[i-1], self.p2.angular_position[i-1], self.p2.angular_velocity[i-1]], 
-                self.time[i-1: i+1]
-                )
-            theta_1 = output[1, 0]
-            omega_1 = output[1, 1]
-            theta_2 = output[1, 2]
-            omega_2 = output[1, 3]
+                t_eval=np.linspace(self.time[i-1], self.time[i], 2), method=method
+                ).y
+            
+            theta_1 = output[0][1]
+            omega_1 = output[1][1]
+            theta_2 = output[2][1]
+            omega_2 = output[3][1]
         
             self.p1.angular_position[i] = self.normalize_angle(theta_1)
             self.p1.x_position[i] = self.p1.convert(theta_1, 'x')
@@ -67,8 +69,8 @@ class System():
             self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_1, theta_2)
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
     
-    def make_data(self):
-        self.run_simulation()
+    def make_data(self, method='RK45'):
+        self.run_simulation(method)
 
         return pd.DataFrame({
         'Time': self.time,
@@ -97,17 +99,24 @@ class System():
 
         return angle  
 
-def plot_data(pendulum_data, plot_energy=False):
-    plt.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='angular_position_1')
-    plt.plot(pendulum_data['Time'], pendulum_data['Angular position 2'], 'g-', label='angular_position_2')
-    plt.legend()
-    plt.show()
+def make_plot(pendulum_data, plot_energy=False, save=False, file_name=None):
+    fig = plt.figure()
+    position_ax = fig.add_subplot(121)
+    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='angular_position_1')
+    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 2'], 'g-', label='angular_position_2')
+    position_ax.legend()
 
     if plot_energy:
-        plt.plot(pendulum_data['Time'], pendulum_data['Kinetic energy'], 'b-', label='kinetic')
-        plt.plot(pendulum_data['Time'], pendulum_data['Potential energy'], 'g-', label='potential')
-        plt.plot(pendulum_data['Time'], pendulum_data['Total energy'], 'r-,', label='total energy')
+        energy_ax = fig.add_subplot(122)
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Kinetic energy'], 'b-', label='kinetic')
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Potential energy'], 'g-', label='potential')
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Total energy'], 'r-,', label='total energy')
         plt.legend()
+    
+    if save:
+        plt.savefig(f'{file_name}.png')
+    
+    else:
         plt.show()
 
 def make_animation(pendulum_data, save=False):
@@ -135,8 +144,8 @@ def make_animation(pendulum_data, save=False):
         file_name = input('Enter file name:')
         anim.save(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}.gif')
 
-def save_data(data, file_name):
-    data.to_pickle(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}')
+def save_data(pendulum_data, file_name):
+    pendulum_data.to_pickle(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}')
 
 def fetch_data(file_name):
     return pd.read_pickle(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}')
