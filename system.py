@@ -111,7 +111,7 @@ class System():
 def find_phase_space():
     pass
 
-def make_plot(pendulum_data, plot_energy=False, save=False, file_name=None):
+def make_plot(pendulum_data, plot_energy=False, save=False, file_name='plot'):
     fig = plt.figure()
     position_ax = fig.add_subplot(121)
     position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='angular_position_1')
@@ -126,7 +126,7 @@ def make_plot(pendulum_data, plot_energy=False, save=False, file_name=None):
         plt.legend()
     
     if save:
-        plt.savefig(f'{file_name}.png')
+        plt.savefig(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\graphs\{file_name}.png')
     
     else:
         plt.show()
@@ -154,7 +154,7 @@ def make_animation(pendulum_data, save=False):
 
     if save:
         file_name = input('Enter file name:')
-        anim.save(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}.gif')
+        anim.save(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\animations\{file_name}.gif')
 
 def save_data(pendulum_data, file_name):
     pendulum_data.to_pickle(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\modelling\{file_name}')
