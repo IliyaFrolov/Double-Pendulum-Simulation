@@ -20,6 +20,7 @@ class System():
         self.p2.K = KineticEnergy(length_1, mass_1, length_2, mass_2, 2)
         self.p2.U = PotentialEnergy(length_1, mass_1, length_2, mass_2, 2)
         self.n = steps
+        self.flip_time = None
         self.time = np.linspace(0, time, steps+1)
         self.kinetic_energy = np.zeros(steps+1)
         self.potential_energy = np.zeros(steps+1)
@@ -54,7 +55,8 @@ class System():
             omega_1 = output[1][1]
             theta_2 = output[2][1]
             omega_2 = output[3][1]
-        
+
+            self.check_flip(theta_1, theta_2, i)
             self.p1.angular_position[i] = self.normalize_angle(theta_1)
             self.p1.x_position[i] = self.p1.convert(theta_1, 'x')
             self.p1.y_position[i] = self.p1.convert(theta_1, 'y')
@@ -69,6 +71,13 @@ class System():
             self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_1, theta_2)
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
     
+    def check_flip(self, theta_1, theta_2, i):
+        self.has_flipped = False
+
+        if theta_1 > pi or theta_1 < -pi and not self.has_flipped:
+            self.flip_time = self.time[i]
+            self.has_flipped = True
+
     def make_data(self, method='RK45'):
         self.run_simulation(method)
 
@@ -98,6 +107,9 @@ class System():
            angle += 2*pi
 
         return angle  
+
+def find_phase_space():
+    pass
 
 def make_plot(pendulum_data, plot_energy=False, save=False, file_name=None):
     fig = plt.figure()
