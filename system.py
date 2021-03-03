@@ -8,7 +8,6 @@ from matplotlib import animation
 class System():
 
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
-        self.g = 9.8
         self.p1 = Pendulum(length_1, mass_1, initial_angular_position_1, initial_angular_velocity_1, steps)
         self.p2 = Pendulum(length_2, mass_2, initial_angular_position_2, initial_angular_velocity_2, steps)
         self.p1.convert = Polar_to_Cartesian(length_1)
@@ -19,6 +18,8 @@ class System():
         self.p1.U = PotentialEnergy(length_1, mass_1, length_2, mass_2, 1)
         self.p2.K = KineticEnergy(length_1, mass_1, length_2, mass_2, 2)
         self.p2.U = PotentialEnergy(length_1, mass_1, length_2, mass_2, 2)
+
+        self.g = 9.8
         self.n = steps
         self.flip_time = time
         self.has_flipped = False
@@ -59,16 +60,19 @@ class System():
             omega_2 = output[3][1]
 
             self.check_flip(theta_1, theta_2, i)
+
             self.p1.angular_position[i] = self.normalize_angle(theta_1)
             self.p1.x_position[i] = self.p1.convert(theta_1, 'x')
             self.p1.y_position[i] = self.p1.convert(theta_1, 'y')
             self.p1.angular_velocity[i] = omega_1
             self.p1.angular_acceleration[i] = self.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
+
             self.p2.angular_position[i] = self.normalize_angle(theta_2)
             self.p2.x_position[i] = self.p1.x_position[i] + self.p1.convert(theta_2, 'x')
             self.p2.y_position[i] = self.p1.y_position[i] + self.p1.convert(theta_2, 'y') 
             self.p2.angular_velocity[i] = omega_2
             self.p2.angular_acceleration[i] = self.p2.dwdt(theta_1, omega_1, theta_2, omega_2)
+            
             self.kinetic_energy[i] =  self.p1.K(theta_1, omega_1, theta_2, omega_2) + self.p2.K(theta_1, omega_1, theta_2, omega_2)
             self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_1, theta_2)
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
@@ -108,11 +112,11 @@ class System():
 
         return angle  
 
-def find_phase_space(steps, time):
-    initial_theta_1 = np.linspace(-pi, pi, steps)
-    initial_theta_2 = np.linspace(-pi, pi, steps)
+def find_phase_space(number_of_points, time):
+    initial_theta_1 = np.linspace(-pi, pi, number_of_points)
+    initial_theta_2 = np.linspace(-pi, pi, number_of_points)
     theta_1, theta_2 = np.meshgrid(initial_theta_1, initial_theta_2)
-    time_to_flip = np.zeros((steps, steps))
+    time_to_flip = np.zeros((number_of_points, number_of_points))
 
     for x, angle_1 in enumerate(initial_theta_1):
         for y, angle_2 in enumerate(initial_theta_2):
