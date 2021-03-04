@@ -21,7 +21,7 @@ class System():
 
         self.g = 9.8
         self.n = steps
-        self.flip_time = time
+        self.flip_time = None
         self.has_flipped = False
         self.time = np.linspace(0, time, steps+1)
         self.kinetic_energy = np.zeros(steps+1)
@@ -45,7 +45,6 @@ class System():
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
     def run_simulation(self, method):
-        print(self.p1.angular_position[0], self.p2.angular_position[0])
         for i in range(1, self.n+1):
             output = solve_ivp(
                 self.model, 
@@ -53,7 +52,7 @@ class System():
                 [self.p1.angular_position[i-1], self.p1.angular_velocity[i-1], self.p2.angular_position[i-1], self.p2.angular_velocity[i-1]], 
                 t_eval=np.linspace(self.time[i-1], self.time[i], 2), method=method
                 ).y
-            print(output)
+            
             theta_1 = output[0][1]
             omega_1 = output[1][1]
             theta_2 = output[2][1]
@@ -76,13 +75,13 @@ class System():
             self.kinetic_energy[i] =  self.p1.K(theta_1, omega_1, theta_2, omega_2) + self.p2.K(theta_1, omega_1, theta_2, omega_2)
             self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_1, theta_2)
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
-        print('----------------')
+        
     def check_flip(self, theta_1, theta_2, i):
-        if theta_1 > pi or theta_1 < -pi or theta_2 > pi or theta_2 < -pi and not self.has_flipped:
+        if (theta_1 > pi or theta_1 < -pi or theta_2 > pi or theta_2 < -pi) and not self.has_flipped:
             self.flip_time = self.time[i]
             self.has_flipped = True
 
-    def make_data(self, method='RK45'):
+    def make_data(self, method='DOP853'):
         self.run_simulation(method)
 
         return pd.DataFrame({
@@ -112,23 +111,27 @@ class System():
 
         return angle  
 
-def find_phase_space(number_of_points, time):
-    initial_theta_1 = np.linspace(-pi, pi, number_of_points)
-    initial_theta_2 = np.linspace(-pi, pi, number_of_points)
-    theta_1, theta_2 = np.meshgrid(initial_theta_1, initial_theta_2)
-    time_to_flip = np.zeros((number_of_points, number_of_points))
+def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace_step_size=10, save=True):
+    initial_theta_1 = np.linspace(-pi, pi, phasespace_step_size)
+    initial_theta_2 = np.linspace(-pi, pi, phasespace_step_size)
+    angle_1, angle_2 = np.meshgrid(initial_theta_1, initial_theta_2)
+    time_to_flip = np.zeros((phasespace_step_size, phasespace_step_size))
 
-    for x, angle_1 in enumerate(initial_theta_1):
-        for y, angle_2 in enumerate(initial_theta_2):
-            pendulum = System(1, 1, 1, 1, angle_1, 0, angle_2, 0, 250, time)
+    for x, theta_1 in enumerate(initial_theta_1):
+        for y, theta_2 in enumerate(initial_theta_2):
+            pendulum = System(length_1, mass_1, length_2, mass_2, theta_1, 0, theta_2, 0, steps, time)
             pendulum.make_data()
-            time_to_flip[x][y] = pendulum.flip_time
+            time_to_flip[x][y] = pendulum.flip_time 
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    cp = ax.contourf(theta_1, theta_2, time_to_flip)
+    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 10/np.sqrt(9.8), 100/np.sqrt(9.8), 1000/np.sqrt(9.8)], extend='max')
     fig.colorbar(cp) 
     plt.show()
+
+    if save:
+        file_name = input('Enter file name: ')
+        plt.savefig(rf'C:\Users\iliya\OneDrive\phys_389\graphs\{file_name}.png')
 
 def make_plot(pendulum_data, plot_energy=False, save=False, file_name='plot'):
     fig = plt.figure()
