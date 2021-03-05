@@ -8,6 +8,7 @@ class Pendulum():
         self.K = KineticEnergy(length, mass, other_length, other_mass, pendulum)
         self.U = PotentialEnergy(length, mass, other_length, other_mass, pendulum)
         self.convert = Polar_to_Cartesian(length)
+        
         self.L = length
         self.m = mass
         self.angular_position = np.zeros(steps+1)
