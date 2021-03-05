@@ -45,8 +45,8 @@ class System():
         self.potential_energy = np.zeros(steps+1)
         self.total_energy = np.zeros(steps+1)
 
-        self.kinetic_energy[0] = self.p1.K(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2) + self.p2.K(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2)
-        self.potential_energy[0] = self.p1.U(initial_angular_position_1, initial_angular_position_2) + self.p2.U(initial_angular_position_1, initial_angular_position_2)
+        self.kinetic_energy[0] = self.p1.K(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2) + self.p2.K(initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1)
+        self.potential_energy[0] = self.p1.U(initial_angular_position_1, initial_angular_position_2) + self.p2.U(initial_angular_position_2, initial_angular_position_1)
         self.total_energy[0] = self.kinetic_energy[0] + self.potential_energy[0]
 
     def model(self, t, initial_conditions):
@@ -55,7 +55,7 @@ class System():
         theta_2 = initial_conditions[2]
         omega_2 = initial_conditions[3]
         dwdt_1 = self.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
-        dwdt_2 = self.p2.dwdt(theta_1, omega_1, theta_2, omega_2)
+        dwdt_2 = self.p2.dwdt(theta_2, omega_2, theta_1, omega_1)
 
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
@@ -82,13 +82,13 @@ class System():
             self.p1.angular_acceleration[i] = self.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
 
             self.p2.angular_position[i] = self.normalize_angle(theta_2)
-            self.p2.x_position[i] = self.p1.x_position[i] + self.p1.convert(theta_2, 'x')
-            self.p2.y_position[i] = self.p1.y_position[i] + self.p1.convert(theta_2, 'y') 
+            self.p2.x_position[i] = self.p1.x_position[i] + self.p2.convert(theta_2, 'x')
+            self.p2.y_position[i] = self.p1.y_position[i] + self.p2.convert(theta_2, 'y') 
             self.p2.angular_velocity[i] = omega_2
-            self.p2.angular_acceleration[i] = self.p2.dwdt(theta_1, omega_1, theta_2, omega_2)
+            self.p2.angular_acceleration[i] = self.p2.dwdt(theta_2, omega_2, theta_1, omega_1)
             
-            self.kinetic_energy[i] =  self.p1.K(theta_1, omega_1, theta_2, omega_2) + self.p2.K(theta_1, omega_1, theta_2, omega_2)
-            self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_1, theta_2)
+            self.kinetic_energy[i] =  self.p1.K(theta_1, omega_1, theta_2, omega_2) + self.p2.K(theta_2, omega_2, theta_1, omega_1)
+            self.potential_energy[i] = self.p1.U(theta_1, theta_2) + self.p2.U(theta_2, theta_1)
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
         
     def check_flip(self, theta_1, theta_2, i):

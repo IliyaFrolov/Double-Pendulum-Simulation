@@ -51,7 +51,7 @@ class KineticEnergy(EquationTerms):
             return self.m1/2*self.L1**2*omega**2
         
         else:
-            return self.m2/2*(self.L1**2*omega**2+self.L2**2*other_omega**2+2*self.L1*self.L2*omega*other_omega*cos(theta-other_theta))
+            return self.m2/2*(self.L1**2*other_omega**2+self.L2**2*omega**2+2*self.L1*self.L2*other_omega*omega*cos(other_theta-theta))
 
 class PotentialEnergy(EquationTerms):
 
@@ -63,6 +63,6 @@ class PotentialEnergy(EquationTerms):
             return self.m1*self.g*self.L1*(1-cos(theta))  
         
         else:
-            return self.m2*self.g*(self.L1*(1-cos(theta))+self.L2*(1-cos(other_theta)))
+            return self.m2*self.g*(self.L1*(1-cos(other_theta))+self.L2*(1-cos(theta)))
         
     

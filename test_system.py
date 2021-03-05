@@ -28,7 +28,7 @@ def test_system_init(system):
     assert system.total_energy[0] == system.kinetic_energy[0] + system.potential_energy[0]
 
 def test_model(system):
-    assert system.model([2.5, 3.5], [pi/2, pi, pi/4, -pi]) == [pi, system.p1.dwdt(pi/2, pi, pi/4, -pi), -pi, system.p2.dwdt(pi/2, pi, pi/4, -pi)]
+    assert system.model([2.5, 3.5], [pi/2, pi, pi/4, -pi]) == [pi, system.p1.dwdt(pi/2, pi, pi/4, -pi), -pi, system.p2.dwdt(pi/4, -pi, pi/2, pi)]
 
 @pytest.mark.parametrize('angle, expected', [
     (pi/2, pi/2), (pi, pi),
