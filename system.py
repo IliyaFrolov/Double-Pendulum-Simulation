@@ -6,7 +6,32 @@ import matplotlib.pyplot as plt
 from matplotlib import animation 
 
 class System():
-
+    '''
+    A class to represent the Double Pendulum.
+    ...
+    Attributes
+    ----------
+    p1 : class
+        Instance of the Pendulum class representing the top pendulum.
+    p2 : class
+        Instance of the Pendulum class representing the bottom pendulum.
+    length_1 : int
+        Rod length of the top pendulum.
+    mass_1 : int
+        Mass of the top pendulum.
+    length_2 : int
+        Rod length of the bottom pendulum.
+    mass_2 : int
+        Mass of the bottom pendulum.
+    initial_angular_position_1 : int
+        Initial angular displacement of the top pendulum.
+    initial_angular_velocity_1 : int
+        Initial angular velocity of the top pendulum.
+    initial_angular_position_2 : int
+        Initial angular displacement of the bottom pendulum.
+    initial_angular_velocity_2 : int
+        Initial angular velocity of the bottom pendulum.
+    '''
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
         self.p1 = Pendulum(length_1, mass_1, initial_angular_position_1, initial_angular_velocity_1, steps)
         self.p2 = Pendulum(length_2, mass_2, initial_angular_position_2, initial_angular_velocity_2, steps)
@@ -125,6 +150,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    ax.set(title='Phase space plot of the time it takes for the Double Pendulum to flip', ylabel='Initial displacement of top Pendulum (radians)', xlabel='Initial displacement of bottom Pendulum (radians)')
     cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 10/np.sqrt(9.8), 100/np.sqrt(9.8), 1000/np.sqrt(9.8)], extend='max')
     fig.colorbar(cp) 
     plt.show()
@@ -133,29 +159,47 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
         file_name = input('Enter file name: ')
         plt.savefig(rf'C:\Users\iliya\OneDrive\phys_389\graphs\{file_name}.png')
 
-def make_plot(pendulum_data, plot_energy=False, save=False, file_name='plot'):
-    fig = plt.figure()
-    position_ax = fig.add_subplot(121)
-    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='angular_position_1')
-    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 2'], 'g-', label='angular_position_2')
-    position_ax.legend()
+def make_plot(pendulum_data, plot_energy=False, file_name=None):
+    fig1 = plt.figure()
+    gs = fig1.add_gridspec(2, 2, hspace=0.5)
+    position_ax = fig1.add_subplot(gs[1, :])
+    position_ax.set(title='Angular displacements of the Double Pendulum over time.', ylabel='Angular displacement (radians)', xlabel='Time (s)')
+    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 1'], 'r-', label='Angular position 1')
+    position_ax.plot(pendulum_data['Time'], pendulum_data['Angular position 2'], 'g-', label='Angular position 2')
+    position_ax.legend(loc='upper left')
+
+    velocity_ax = fig1.add_subplot(gs[0, 0])
+    velocity_ax.set(title='Angular velocities of the Double Pendulum over time.', ylabel='Angular velocity (radians/s)', xlabel='Time (s)')
+    velocity_ax.plot(pendulum_data['Time'], pendulum_data['Angular velocity 1'], 'r-', label='Angular velocity 1')
+    velocity_ax.plot(pendulum_data['Time'], pendulum_data['Angular velocity 2'], 'g-', label='Angular velocity 2')
+    velocity_ax.legend(loc='upper left')
+
+    acceleration_ax = fig1.add_subplot(gs[0, 1])
+    acceleration_ax.set(title='Angular acceleration of the Double Pendulum over time.', ylabel='Angular acceleration (radians/s^2)', xlabel='Time (s)')
+    acceleration_ax.plot(pendulum_data['Time'], pendulum_data['Angular acceleration 1'], 'r-', label='Angular acceleration 1')
+    acceleration_ax.plot(pendulum_data['Time'], pendulum_data['Angular acceleration 2'], 'g-', label='Angular acceleration 2')
+    acceleration_ax.legend(loc='upper left')
 
     if plot_energy:
-        energy_ax = fig.add_subplot(122)
-        energy_ax.plot(pendulum_data['Time'], pendulum_data['Kinetic energy'], 'b-', label='kinetic')
-        energy_ax.plot(pendulum_data['Time'], pendulum_data['Potential energy'], 'g-', label='potential')
-        energy_ax.plot(pendulum_data['Time'], pendulum_data['Total energy'], 'r-,', label='total energy')
-        plt.legend()
+        fig2 = plt.figure()
+        energy_ax = fig2.add_subplot(111)
+        energy_ax.set(title='Energy of the Double Pendulum over time.', ylabel='Energy (J)', xlabel='Time (s)')
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Kinetic energy'], 'b-', label='Kinetic energy')
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Potential energy'], 'g-', label='Potential energy')
+        energy_ax.plot(pendulum_data['Time'], pendulum_data['Total energy'], 'r-,', label='Total energy')
+        plt.legend(loc='upper left')
     
-    if save:
-        plt.savefig(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\graphs\{file_name}.png')
+    if file_name:
+        fig1.savefig(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\graphs\{file_name}.png')
+        fig2.savefig(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\graphs\{file_name}.png')
     
     else:
         plt.show()
 
-def make_animation(pendulum_data, save=False):
+def make_animation(pendulum_data, file_name=None):
     fig = plt.figure()
     ax = plt.axes(xlim=(-2, 2), ylim=(-2, 2))
+    ax.set(title='Animation of the Double Pendulum', ylabel='Angular displacement (radians)', xlabel='Angular displacement (radians)')
     line, = ax.plot([], [], 'o-')
 
     def init():
@@ -171,11 +215,10 @@ def make_animation(pendulum_data, save=False):
     
         return line,
 
-    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=1000, interval=20, blit=True)
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=10000, interval=10, blit=True)
     plt.show()
 
-    if save:
-        file_name = input('Enter file name:')
+    if file_name:
         anim.save(rf'C:\Users\Iliya Frolov\OneDrive\phys_389\animations\{file_name}.gif')
 
 def save_data(pendulum_data, file_name):
