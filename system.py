@@ -33,8 +33,8 @@ class System():
         Initial angular velocity of the bottom pendulum.
     '''
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
-        self.p1 = Pendulum(length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, steps, 1)
-        self.p2 = Pendulum(length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, steps, 2)
+        self.p1 = Pendulum(length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, 1)
+        self.p2 = Pendulum(length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps, 2)
 
         self.g = 9.8
         self.n = steps
@@ -45,8 +45,6 @@ class System():
         self.potential_energy = np.zeros(steps+1)
         self.total_energy = np.zeros(steps+1)
 
-        self.p1.angular_acceleration[0] = self.p1.dwdt(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2)
-        self.p2.angular_acceleration[0] = self.p2.dwdt(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2)
         self.kinetic_energy[0] = self.p1.K(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2) + self.p2.K(initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2)
         self.potential_energy[0] = self.p1.U(initial_angular_position_1, initial_angular_position_2) + self.p2.U(initial_angular_position_1, initial_angular_position_2)
         self.total_energy[0] = self.kinetic_energy[0] + self.potential_energy[0]

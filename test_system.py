@@ -1,4 +1,4 @@
-from system import System, Pendulum, pi
+from system import System, Pendulum, pi, cos, sin
 import pytest
 from math import isclose
 
@@ -13,13 +13,19 @@ def system():
     return System(length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time)
 
 def test_system_init(system):
-    assert system.g == 9.8
-    assert system.n == 1000
-    assert len(system.time) == 1001
     assert isinstance(system.p1, Pendulum)
     assert isinstance(system.p2, Pendulum)
-    assert system.p1.angular_acceleration[0] == system.p1.dwdt(pi/2, 0, pi/4, 0)
-    assert system.p2.angular_acceleration[0] == system.p2.dwdt(pi/2, 0, pi/4, 0)
+    assert system.g == 9.8
+    assert system.n == 1000
+    assert system.flip_time == None
+    assert system.has_flipped == False
+    assert len(system.time) == 1001
+    assert len(system.kinetic_energy) == 1001
+    assert len(system.potential_energy) == 1001
+    assert len(system.total_energy) == 1001
+    assert system.kinetic_energy[0] == system.p1.m/2*system.p1.L**2*system.p1.angular_velocity[0]**2 + system.p2.m/2*(system.p1.L**2*system.p1.angular_velocity[0]**2+system.p2.L**2*system.p2.angular_velocity[0]**2+2*system.p1.L*system.p2.L*system.p1.angular_velocity[0]*system.p2.angular_velocity[0]*cos(system.p1.angular_position[0]-system.p2.angular_position[0]))
+    assert system.potential_energy[0] ==  system.p1.m*9.8*system.p1.L*(1-cos(system.p1.angular_position[0])) + system.p2.m*9.8*(system.p1.L*(1-cos(system.p1.angular_position[0]))+system.p2.L*(1-cos(system.p2.angular_position[0])))  
+    assert system.total_energy[0] == system.kinetic_energy[0] + system.potential_energy[0]
 
 def test_model(system):
     assert system.model([2.5, 3.5], [pi/2, pi, pi/4, -pi]) == [pi, system.p1.dwdt(pi/2, pi, pi/4, -pi), -pi, system.p2.dwdt(pi/2, pi, pi/4, -pi)]
