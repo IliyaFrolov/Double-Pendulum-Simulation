@@ -3,7 +3,10 @@ from equations import *
 
 class Pendulum():
 
-    def __init__(self, length, mass, initial_angular_position, initial_angular_velocity, steps):
+    def __init__(self, length, mass, other_length, other_mass, initial_angular_position, initial_angular_velocity, steps, pendulum):
+        self.dwdt = Acceleration(length, mass, other_length, other_mass, pendulum)
+        self.K = KineticEnergy(length, mass, other_length, other_mass, pendulum)
+        self.U = PotentialEnergy(length, mass, other_length, other_mass, pendulum)
         self.convert = Polar_to_Cartesian(length)
         self.L = length
         self.m = mass

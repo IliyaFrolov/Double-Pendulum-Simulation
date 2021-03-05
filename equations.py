@@ -18,15 +18,15 @@ class Polar_to_Cartesian():
 class EquationTerms():
 
     def __init__(self, length_1, mass_1, length_2, mass_2, pendulum_bob):
-        self.g = 9.8
-        self.L1 = length_1
-        self.m1 = mass_1
-        self.L2 = length_2
-        self.m2 = mass_2
-        self.pendulum_bob = pendulum_bob
-
         if pendulum_bob != 1 and pendulum_bob != 2:
             raise Exception('Parameter "pendulum_bob" must be either 1 or 2.')
+
+        self.g = 9.8
+        self.L1 = length_1 if pendulum_bob == 1 else length_2
+        self.m1 = mass_1 if pendulum_bob == 1 else mass_2
+        self.L2 = length_2 if pendulum_bob == 2 else length_1
+        self.m2 = mass_2 if pendulum_bob == 2 else mass_2
+        self.pendulum_bob = pendulum_bob
 
 class Acceleration(EquationTerms):
 
