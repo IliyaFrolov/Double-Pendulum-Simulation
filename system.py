@@ -15,22 +15,35 @@ class System():
         Instance of the Pendulum class representing the top pendulum.
     p2 : class
         Instance of the Pendulum class representing the bottom pendulum.
-    length_1 : int
-        Rod length of the top pendulum.
-    mass_1 : int
-        Mass of the top pendulum.
-    length_2 : int
-        Rod length of the bottom pendulum.
-    mass_2 : int
-        Mass of the bottom pendulum.
-    initial_angular_position_1 : int
-        Initial angular displacement of the top pendulum.
-    initial_angular_velocity_1 : int
-        Initial angular velocity of the top pendulum.
-    initial_angular_position_2 : int
-        Initial angular displacement of the bottom pendulum.
-    initial_angular_velocity_2 : int
-        Initial angular velocity of the bottom pendulum.
+    g : int
+        Gravitational acceleration constant.
+    n : int
+        Number of steps in the simulation.
+    flip_time : int
+        The time it takes for one of the pendulum bobs to flip. Is set to None by default if there's no flip.
+    has_flipped : boolean
+        Is set to True if one of the pendulum bobs has flipped, is False otherwise.
+    time : numpy array
+        Stores the time of the simulation at each step.
+    kinetic_energy : numpy array
+        Stores the kinetic energy of the system at each step.
+    potential_energy : numpy array
+        Stores the potential energy of the system at each step.
+    total_energy : numpy array
+        Stores the total energy of the system at each step.
+    
+    Methods
+    ----------
+    model(t, initial_conditions)
+        Function is used as an input into solve_ivp to get the angular position and velocity of each pendulum bob at the next step.
+    run_simulation(method)
+        Uses solve_ivp within a "for loop" to compute and store the position and velocity (angular and linear) for each pendulum bob at each step. 
+    check_flip(theta_1, theta_2, i)
+        Checks if one of the pendulum bobs has flipped, if so, stores the time of flip.
+    make_data(method)
+        Calls self.run_simulation and returns all the computed data as a Pandas Dataframe.
+    normalise_angle(anlge)
+        Normalises the angle between -pi and pi. Returns the angle.
     '''
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
         self.p1 = Pendulum(length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, 1)
