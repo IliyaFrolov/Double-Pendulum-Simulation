@@ -1,3 +1,4 @@
+import numpy as np
 from numpy import sin, cos, pi
 
 class Polar_to_Cartesian():

@@ -1,4 +1,3 @@
-import numpy as np
 from equations import *
 
 class Pendulum():

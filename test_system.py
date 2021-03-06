@@ -1,4 +1,4 @@
-from system import System, Pendulum, pi, cos, sin
+from system import System, pi, cos, sin, Pendulum
 import pytest
 from math import isclose
 
