@@ -7,22 +7,22 @@ from matplotlib import animation
 
 class System():
     '''
-    A class to represent the Double Pendulum.
+    A class to represent the Double Pendulum and run the simulation.
     ...
     Attributes
     ----------
-    p1 : class
+    p1 : object
         Instance of the Pendulum class representing the top pendulum.
-    p2 : class
+    p2 : object
         Instance of the Pendulum class representing the bottom pendulum.
     g : int
         Gravitational acceleration constant.
     n : int
         Number of steps in the simulation.
     flip_time : int
-        The time it takes for one of the pendulum bobs to flip. Is set to None by default if there's no flip.
+        The time it takes for either of the pendulum bobs to flip (set to None by default if there's no flip).
     has_flipped : boolean
-        Is set to True if one of the pendulum bobs has flipped, is False otherwise.
+        Is set to True if either of the pendulum bobs has flipped, is False otherwise.
     time : numpy array
         Stores the time of the simulation at each step.
     kinetic_energy : numpy array
@@ -37,15 +37,41 @@ class System():
     model(t, initial_conditions)
         Function is used as an input into solve_ivp to get the angular position and velocity of each pendulum bob at the next step.
     run_simulation(method)
-        Uses solve_ivp within a "for loop" to compute and store the position and velocity (angular and linear) for each pendulum bob at each step. 
+        Uses solve_ivp within a for loop to compute and store properties such as kinetic energy, potential energy, total energy, position and velocity (angular and linear) for each pendulum bob at each step. 
     check_flip(theta_1, theta_2, i)
-        Checks if one of the pendulum bobs has flipped, if so, stores the time of flip.
+        Checks if either of the pendulum bobs has flipped, if so, stores the time of flip.
     make_data(method)
         Calls self.run_simulation and returns all the computed data as a Pandas Dataframe.
     normalise_angle(anlge)
-        Normalises the angle between -pi and pi. Returns the angle.
+        Normalises an angle between -pi and pi. 
     '''
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
+        '''
+        Constructs all the necessary attributes for the System object and sets the initial values for the kinetic energy, potential energy and the total energy.
+        ...
+        Parameters
+        -----------
+        length_1 : int
+            Rod length of the top pendulum bob.
+        mass_1 : int
+            Mass of the top pendulum bob.
+        length_2 : int
+            Rod length of the bottom pendulum bob.
+        mass_2 : int
+            Mass of the bottom pendulum bob.
+        initial_angular_position_1 : int
+            Intitial angular displacement of the top pendulum bob from its equilibrium point.
+        initial_angular_velocity_1 : int
+            Initial angular velocity of the top pendulum bob (usually 0 if not at equilibrium).
+        initial_angular_position_2 : int
+            Intitial angular displacement of the bottom pendulum bob from its equilibrium point.
+        initial_angular_velocity_2 : int
+            Initial angular velocity of the bottom pendulum bob (usually 0 if not at equilibrium).
+        steps: int
+            Number of steps in the simulation.
+        time : int
+            Total time the simulation runs for.
+        '''
         self.p1 = Pendulum(length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, 1)
         self.p2 = Pendulum(length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps, 2)
 
@@ -63,6 +89,21 @@ class System():
         self.total_energy[0] = self.kinetic_energy[0] + self.potential_energy[0]
 
     def model(self, t, initial_conditions):
+        '''
+        Function is a parameter of solve_ivp. Return of function is used to calculate the angular displacement and velocity of each pendulum bob at the next step.
+        ...
+        Parameters
+        -----------
+        t : numpy array slice, required
+            Time interval between current and next step.
+        initial_conditions : list, required
+            List containing the initial angular displacement and velocity of both pendulum bobs at the current step.
+        
+        Returns
+        ----------
+        list
+            List containing the angular velocity and acceleration of both pendulum bobs.
+        '''
         theta_1 = initial_conditions[0]
         omega_1 = initial_conditions[1]
         theta_2 = initial_conditions[2]
@@ -73,6 +114,18 @@ class System():
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
     def run_simulation(self, method):
+        '''
+        Uses solve_ivp within a for loop to compute and store the position and velocity (angular and linear) for each pendulum bob at each step. 
+
+        Parameters
+        ----------
+        method : string, required
+            Used as a parameter in solve_ivp to select the approximation method to be used.
+        
+        Returns
+        -----------
+        None
+        '''
         for i in range(1, self.n+1):
             output = solve_ivp(
                 self.model, 
@@ -105,11 +158,40 @@ class System():
             self.total_energy[i] = self.kinetic_energy[i] + self.potential_energy[i] 
         
     def check_flip(self, theta_1, theta_2, i):
+        '''
+        Checks if either of the pendulum bobs has flipped, if so, stores the time of flip.
+
+        Parameters
+        ----------
+        theta_1 : int
+            Angular displacement of the top pendulum bob.
+        theta_2 : int
+            Angular displacement of the bottom pendulum bob.
+        i : int
+            Loop variable 
+        
+        Returns
+        ---------
+        None
+        '''
         if (theta_1 > pi or theta_1 < -pi or theta_2 > pi or theta_2 < -pi) and not self.has_flipped:
             self.flip_time = self.time[i]
             self.has_flipped = True
 
     def make_data(self, method='DOP853'):
+        '''
+        Calls self.run_simulation and returns all the computed data as a Pandas Dataframe.
+
+        Parameters
+        ----------
+        method : string, optional
+            Used as a parameter in solve_ivp to select the approximation method to be used. Is set the main approximation method by default.
+        
+        Returns
+        ---------
+        Dataframe
+            A Pandas Dataframe containing the results of the simulation.
+        '''
         self.run_simulation(method)
 
         return pd.DataFrame({
@@ -131,10 +213,23 @@ class System():
     
     @staticmethod
     def normalize_angle(angle):
+        '''
+        Normalises an angle between -pi and pi.
+
+        Parameters
+        ----------
+        angle: int, required
+            Angle to be normalised.
+        
+        Returns
+        ---------
+        int
+            Normalised angle.
+        '''
         while angle > pi:
            angle -= 2*pi
         
-        while angle < -pi:
+        while angle <= -pi:
            angle += 2*pi
 
         return angle  

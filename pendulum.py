@@ -15,8 +15,8 @@ class Pendulum():
         self.U = PotentialEnergy(length, mass, other_length, other_mass, pendulum)
         self.convert = Polar_to_Cartesian(length)
 
-        self.length = length
-        self.mass = mass
+        self.L = length
+        self.m = mass
         self.theta = initial_angular_position
         self.omega = initial_angular_velocity
         self.pendulum = pendulum
@@ -31,4 +31,4 @@ class Pendulum():
         self.angular_acceleration[0] = self.dwdt(initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity)
 
     def __repr__(self):
-        return f'Pendulum: {self.pendulum} ("1" for top bob "2" for bottom bob), Rod Length: {self.length}, Bob Mass: {self.mass}, Initial Angular Position: {self.theta}, Initial Angular Velocity: {self.omega}'
+        return f'Pendulum: {self.pendulum} ("1" for top bob "2" for bottom bob), Rod Length: {self.L}, Bob Mass: {self.m}, Initial Angular Position: {self.theta}, Initial Angular Velocity: {self.omega}'
