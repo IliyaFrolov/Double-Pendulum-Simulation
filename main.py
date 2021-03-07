@@ -8,17 +8,21 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
     initial_theta_2 = np.linspace(-pi, pi, phasespace_step_size)
     angle_1, angle_2 = np.meshgrid(initial_theta_1, initial_theta_2)
     time_to_flip = np.zeros((phasespace_step_size, phasespace_step_size))
+    i = phasespace_step_size**2
+    units = np.sqrt(length_1/9.8)
 
     for x, theta_1 in enumerate(initial_theta_1):
         for y, theta_2 in enumerate(initial_theta_2):
             pendulum = System(length_1, mass_1, length_2, mass_2, theta_1, 0, theta_2, 0, steps, time)
             pendulum.make_data()
             time_to_flip[x][y] = pendulum.flip_time 
+            i -= 1
+            print(f'{i} iterations remaining')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set(title='Phase space plot of the time it takes for the Double Pendulum to flip', ylabel='Initial displacement of top Pendulum (radians)', xlabel='Initial displacement of bottom Pendulum (radians)')
-    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 10/np.sqrt(9.8), 100/np.sqrt(9.8), 1000/np.sqrt(9.8)], extend='max')
+    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 5*units, 10*units, 50*units, 100*units, 500*units, 1000*units], extend='max')
     fig.colorbar(cp) 
     plt.show()
 

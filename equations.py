@@ -18,21 +18,21 @@ class Polar_to_Cartesian():
 
 class EquationTerms():
 
-    def __init__(self, length, mass, other_length, other_mass, pendulum_bob):
+    def __init__(self, pendulum_bob, length, mass, other_length, other_mass):
         if pendulum_bob != 1 and pendulum_bob != 2:
             raise Exception('Parameter "pendulum_bob" must be either 1 or 2.')
 
+        self.pendulum_bob = pendulum_bob
         self.g = 9.8
         self.L1 = length if pendulum_bob == 1 else other_length
         self.m1 = mass if pendulum_bob == 1 else other_mass
         self.L2 = other_length if pendulum_bob == 1 else length
         self.m2 = other_mass if pendulum_bob == 1 else mass
-        self.pendulum_bob = pendulum_bob
 
 class Acceleration(EquationTerms):
 
-    def __init__(self, length, mass, other_length, other_mass, pendulum_bob):
-        super().__init__(length, mass, other_length, other_mass, pendulum_bob)
+    def __init__(self, pendulum_bob, length, mass, other_length, other_mass):
+        super().__init__(pendulum_bob, length, mass, other_length, other_mass)
     
     def __call__(self, theta, omega, other_theta, other_omega):
         if self.pendulum_bob == 1:
@@ -44,8 +44,8 @@ class Acceleration(EquationTerms):
 
 class KineticEnergy(EquationTerms):
 
-    def __init__(self, length, mass, other_length, other_mass, pendulum_bob):
-        super().__init__(length, mass, other_length, other_mass, pendulum_bob)
+    def __init__(self,pendulum_bob, length, mass, other_length, other_mass):
+        super().__init__(pendulum_bob, length, mass, other_length, other_mass)
     
     def __call__(self, theta, omega, other_theta, other_omega):
         if self.pendulum_bob == 1:
@@ -56,8 +56,8 @@ class KineticEnergy(EquationTerms):
 
 class PotentialEnergy(EquationTerms):
 
-    def __init__(self, length, mass, other_length, other_mass, pendulum_bob):
-        super().__init__(length, mass, other_length, other_mass, pendulum_bob)
+    def __init__(self, pendulum_bob, length, mass, other_length, other_mass):
+        super().__init__(pendulum_bob, length, mass, other_length, other_mass)
          
     def __call__(self, theta, other_theta):
         if self.pendulum_bob == 1:

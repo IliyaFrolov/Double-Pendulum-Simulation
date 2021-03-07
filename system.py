@@ -43,6 +43,7 @@ class System():
     normalise_angle(anlge)
         Normalises an angle between -pi and pi. 
     '''
+    
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
         '''
         Constructs all the necessary attributes for the System object and sets the initial values for the kinetic energy, potential energy and the total energy.
@@ -70,11 +71,12 @@ class System():
         time : int
             Total time the simulation runs for.
         '''
+
         if length_1 == 0 or mass_1 == 0 or length_2 == 0 or mass_2 == 0:
             raise Exception('Parameters length_1, mass_2, length_2 and mass_2 cannot be equal to 0')
 
-        self.p1 = Pendulum(length_1, mass_1, length_2, mass_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, steps, 1)
-        self.p2 = Pendulum(length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps, 2)
+        self.p1 = Pendulum(1, length_1, mass_1, length_2, mass_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, steps)
+        self.p2 = Pendulum(2, length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps)
 
         self.g = 9.8
         self.n = steps
@@ -105,6 +107,7 @@ class System():
         list
             List containing the angular velocity and acceleration of both pendulum bobs.
         '''
+
         theta_1 = initial_conditions[0]
         omega_1 = initial_conditions[1]
         theta_2 = initial_conditions[2]
@@ -127,6 +130,7 @@ class System():
         -----------
         None
         '''
+
         for i in range(1, self.n+1):
             output = solve_ivp(
                 self.model, 
@@ -175,6 +179,7 @@ class System():
         ---------
         None
         '''
+
         if (theta_1 > pi or theta_1 < -pi or theta_2 > pi or theta_2 < -pi) and not self.has_flipped:
             self.flip_time = self.time[i]
             self.has_flipped = True
@@ -193,6 +198,7 @@ class System():
         Dataframe
             A Pandas Dataframe containing the results of the simulation.
         '''
+
         self.run_simulation(method)
 
         return pd.DataFrame({
@@ -227,6 +233,7 @@ class System():
         int
             Normalised angle.
         '''
+        
         while angle > pi:
            angle -= 2*pi
         
