@@ -70,7 +70,10 @@ class System():
         time : int
             Total time the simulation runs for.
         '''
-        self.p1 = Pendulum(length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, 1)
+        if length_1 == 0 or mass_1 == 0 or length_2 == 0 or mass_2 == 0:
+            raise Exception('Parameters length_1, mass_2, length_2 and mass_2 cannot be equal to 0')
+
+        self.p1 = Pendulum(length_1, mass_1, length_2, mass_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, steps, 1)
         self.p2 = Pendulum(length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps, 2)
 
         self.g = 9.8
@@ -139,13 +142,13 @@ class System():
 
             self.check_flip(theta_1, theta_2, i)
 
-            self.p1.angular_position[i] = self.normalize_angle(theta_1)
+            self.p1.angular_position[i] = self.normalise_angle(theta_1)
             self.p1.x_position[i] = self.p1.convert(theta_1, 'x')
             self.p1.y_position[i] = self.p1.convert(theta_1, 'y')
             self.p1.angular_velocity[i] = omega_1
             self.p1.angular_acceleration[i] = self.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
 
-            self.p2.angular_position[i] = self.normalize_angle(theta_2)
+            self.p2.angular_position[i] = self.normalise_angle(theta_2)
             self.p2.x_position[i] = self.p1.x_position[i] + self.p2.convert(theta_2, 'x')
             self.p2.y_position[i] = self.p1.y_position[i] + self.p2.convert(theta_2, 'y') 
             self.p2.angular_velocity[i] = omega_2
@@ -210,7 +213,7 @@ class System():
         })
     
     @staticmethod
-    def normalize_angle(angle):
+    def normalise_angle(angle):
         '''
         Normalises an angle between -pi and pi.
 

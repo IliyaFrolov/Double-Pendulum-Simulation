@@ -27,6 +27,10 @@ def test_system_init(system):
     assert system.potential_energy[0] ==  system.p1.m*9.8*system.p1.L*(1-cos(system.p1.angular_position[0])) + system.p2.m*9.8*(system.p1.L*(1-cos(system.p1.angular_position[0]))+system.p2.L*(1-cos(system.p2.angular_position[0])))  
     assert system.total_energy[0] == system.kinetic_energy[0] + system.potential_energy[0]
 
+    with pytest.raises(Exception):
+        System(1, 0, 1, 1, pi/2, 0, pi/2, 0, 10, 10)
+        System(1, 1, 0, 0, pi/2, 0, pi/2, 0, 10, 10)
+
 def test_model(system):
     assert system.model([2.5, 3.5], [pi/2, pi, pi/4, -pi]) == [pi, system.p1.dwdt(pi/2, pi, pi/4, -pi), -pi, system.p2.dwdt(pi/4, -pi, pi/2, pi)]
 
@@ -37,7 +41,7 @@ def test_model(system):
     (13*pi, -pi) 
     ])
 def test_normalise_angle(angle, expected):
-    assert isclose(System.normalize_angle(angle), expected)
+    assert isclose(System.normalise_angle(angle), expected)
 
 
 
