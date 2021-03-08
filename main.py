@@ -8,7 +8,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
     initial_theta_2 = np.linspace(-pi, pi, phasespace_step_size)
     angle_1, angle_2 = np.meshgrid(initial_theta_1, initial_theta_2)
     time_to_flip = np.zeros((phasespace_step_size, phasespace_step_size))
-    i = phasespace_step_size**2
+    counter = phasespace_step_size**2
     units = np.sqrt(length_1/9.8)
 
     for x, theta_1 in enumerate(initial_theta_1):
@@ -16,13 +16,13 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
             pendulum = System(length_1, mass_1, length_2, mass_2, theta_1, 0, theta_2, 0, steps, time)
             pendulum.make_data()
             time_to_flip[x][y] = pendulum.flip_time 
-            i -= 1
-            print(f'{i} iterations remaining')
+            counter -= 1
+            print(f'{counter} iterations remaining')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set(title='Phase space plot of the time it takes for the Double Pendulum to flip', ylabel='Initial displacement of top Pendulum (radians)', xlabel='Initial displacement of bottom Pendulum (radians)')
-    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 5*units, 10*units, 50*units, 100*units, 500*units, 1000*units], extend='max')
+    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 10*units, 100*units, 1000*units], cmap='jet' ,extend='max')
     fig.colorbar(cp) 
     plt.show()
 
@@ -69,11 +69,13 @@ def make_plot(pendulum_data, plot_energy=False, save=False):
             file_name = input('Enter file name: ')
             fig2.savefig(rf'{os.getcwd()}\graphs\{file_name}.png')
 
-def make_animation(pendulum_data, file_name=None):
+def make_animation(pendulum, pendulum_data, file_name=None):
     fig = plt.figure()
-    ax = plt.axes(xlim=(-2, 2), ylim=(-2, 2))
+    total_length = pendulum.p1.L + pendulum.p2.L
+    ax = plt.axes(xlim=(-total_length-0.5, total_length+0.5), ylim=(-total_length-0.5, total_length+0.5))
     ax.set(title='Animation of the Double Pendulum', ylabel='Angular displacement (radians)', xlabel='Angular displacement (radians)')
     line, = ax.plot([], [], 'o-')
+    frames = pendulum.n
 
     def init():
         line.set_data([], [])
@@ -88,7 +90,8 @@ def make_animation(pendulum_data, file_name=None):
     
         return line,
 
-    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=10000, interval=10, blit=True)
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=frames, interval=10, blit=True)
+    plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
 
     if file_name:

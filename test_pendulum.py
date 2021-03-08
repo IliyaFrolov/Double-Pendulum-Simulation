@@ -10,8 +10,8 @@ def test_pendulum():
     initial_angular_position_2 = pi/4
     initial_angular_velocity_2 = 0
     steps =  1000
-    pendulum_1 = Pendulum(length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, 1)
-    pendulum_2 = Pendulum(length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps, 2)
+    pendulum_1 = Pendulum(1, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps)
+    pendulum_2 = Pendulum(2, length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps)
 
     assert pendulum_1.L == 1
     assert pendulum_1.m == 5

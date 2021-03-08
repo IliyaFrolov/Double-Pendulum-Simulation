@@ -73,10 +73,10 @@ class System():
         '''
 
         if length_1 == 0 or mass_1 == 0 or length_2 == 0 or mass_2 == 0:
-            raise Exception('Parameters length_1, mass_2, length_2 and mass_2 cannot be equal to 0')
+            raise Exception('Parameters length_1, mass_2, length_2 or mass_2 cannot be equal to 0')
 
         self.p1 = Pendulum(1, length_1, mass_1, length_2, mass_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, steps)
-        self.p2 = Pendulum(2, length_2, mass_2, length_1, mass_1, initial_angular_position_2, initial_angular_velocity_2, initial_angular_position_1, initial_angular_velocity_1, steps)
+        self.p2 = Pendulum(2, length_2, mass_2, length_1, mass_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, steps)
 
         self.g = 9.8
         self.n = steps
@@ -233,7 +233,7 @@ class System():
         int
             Normalised angle.
         '''
-        
+
         while angle > pi:
            angle -= 2*pi
         
