@@ -117,7 +117,7 @@ class System():
 
         return [omega_1, dwdt_1, omega_2, dwdt_2]    
     
-    def run_simulation(self, method):
+    def run_simulation(self, method, is_phase=False):
         '''
         Uses solve_ivp within a for loop to compute and store the position and velocity (angular and linear) for each pendulum bob at each step. 
 
@@ -125,6 +125,8 @@ class System():
         ----------
         method : string, required
             Used as a parameter in solve_ivp to select the approximation method to be used.
+        is_phase: Boolean, optional
+            A parameter that is True if the simulation is finding the time of flip, False otherwise.
         
         Returns
         -----------
@@ -145,6 +147,9 @@ class System():
             omega_2 = output[3][1]
 
             self.check_flip(theta_1, theta_2, i)
+
+            if self.has_flipped and is_phase: # Stops the for loop and ends the function if the flip time is found.
+                return
 
             self.p1.angular_position[i] = self.normalise_angle(theta_1)
             self.p1.x_position[i] = self.p1.convert(theta_1, 'x')

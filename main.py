@@ -14,7 +14,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
     for x, theta_1 in enumerate(initial_theta_1):
         for y, theta_2 in enumerate(initial_theta_2):
             pendulum = System(length_1, mass_1, length_2, mass_2, theta_1, 0, theta_2, 0, steps, time)
-            pendulum.make_data()
+            pendulum.run_simulation(method='DOP853', is_phase=True)
             time_to_flip[x][y] = pendulum.flip_time 
             counter -= 1
             print(f'{counter} iterations remaining')
@@ -22,7 +22,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set(title='Phase space plot of the time it takes for the Double Pendulum to flip', ylabel='Initial displacement of top Pendulum (radians)', xlabel='Initial displacement of bottom Pendulum (radians)')
-    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 10*units, 100*units, 1000*units], cmap='jet' ,extend='max')
+    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 5*units, 10*units, 50*units, 100*units, 500*units, 1000*units], cmap='jet' ,extend='max')
     fig.colorbar(cp) 
     plt.show()
 
