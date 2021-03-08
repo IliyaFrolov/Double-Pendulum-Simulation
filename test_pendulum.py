@@ -1,10 +1,7 @@
 from system import Pendulum, pi, cos, sin
 
 def test_pendulum():
-    length_1 = 1
-    mass_1 = 5
-    length_2 = 3
-    mass_2 = 2
+    length_1, mass_1, length_2, mass_2 = 1, 5, 3, 2
     initial_angular_position_1 = pi/2
     initial_angular_velocity_1 = 0
     initial_angular_position_2 = pi/4

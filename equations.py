@@ -103,7 +103,7 @@ class EquationTerms():
 
         self.pendulum_bob = pendulum_bob
         self.g = 9.8
-        self.L1 = length if pendulum_bob == 1 else other_length
+        self.L1 = length if pendulum_bob == 1 else other_length # This assignment technique ensures that the rod lengths and bob masses are always assigned to the correct pendulum bob, i.e. self.L1 will always correspond to the rod length of the top pendulum bob.
         self.m1 = mass if pendulum_bob == 1 else other_mass
         self.L2 = other_length if pendulum_bob == 1 else length
         self.m2 = other_mass if pendulum_bob == 1 else mass

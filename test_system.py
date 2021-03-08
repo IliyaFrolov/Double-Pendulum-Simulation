@@ -31,8 +31,32 @@ def test_system_init(system):
         System(1, 0, 1, 1, pi/2, 0, pi/2, 0, 10, 10)
         System(1, 1, 0, 0, pi/2, 0, pi/2, 0, 10, 10)
 
-def test_model(system):
-    assert system.model([2.5, 3.5], [pi/2, pi, pi/4, -pi]) == [pi, system.p1.dwdt(pi/2, pi, pi/4, -pi), -pi, system.p2.dwdt(pi/4, -pi, pi/2, pi)]
+@pytest.mark.parametrize('t, theta_1, omega_1, theta_2, omega_2', [
+    ([2.5, 3.5], pi/2, pi, pi/4, -pi),
+    ([4, 5], 5*pi, -pi, -3*pi/2, pi/2),
+    ([0, 4], 6*pi, -pi/4, -2*pi, 8*pi/3)
+])
+def test_model(system, t, theta_1, omega_1, theta_2, omega_2):
+    dwdt_1 = system.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
+    dwdt_2 = system.p2.dwdt(theta_2, omega_2, theta_1, omega_1)
+    assert system.model(t, [theta_1, omega_1, theta_2, omega_2]) == [omega_1, dwdt_1, omega_2, dwdt_2]
+
+def test_check_flip(system):
+    theta_1, theta_2, i = pi/2, pi/4 , 2
+    system.has_flipped = False
+    system.check_flip(theta_1, theta_2, i)
+    assert system.has_flipped == False
+
+    theta_1, theta_2, i = pi, -pi , 2
+    system.has_flipped = False
+    system.check_flip(theta_1, theta_2, i)
+    assert system.has_flipped == False
+
+    theta_1, theta_2, i = 2*pi, pi/4 , 2
+    system.has_flipped = False
+    system.check_flip(theta_1, theta_2, i)
+    assert system.has_flipped == True
+
 
 @pytest.mark.parametrize('angle, expected', [
     (pi/2, pi/2), (pi, pi),
