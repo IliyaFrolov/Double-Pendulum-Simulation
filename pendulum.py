@@ -43,7 +43,7 @@ class Pendulum():
         A dunder method used to print a summary of information about the pendulum bob.
     '''
 
-    def __init__(self, pendulum_bob, length, mass, other_length, other_mass, initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity, steps, time=None):
+    def __init__(self, pendulum_bob, length, mass, other_length, other_mass, initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity, steps, time=0):
         '''
         Constructs all the necessary attributes for the Pendulum object and sets the initial values for the angular displacement, velocity and acceleration of the pendulum bob.
         
@@ -143,9 +143,9 @@ class Pendulum():
         output = solve_ivp(self.model, [0, self.t[-1]], [self.angular_position[0], self.angular_velocity[0]], t_eval=np.linspace(0, self.t[-1], self.n), method='Radau').y
         theta = output[0]
         omega = output[1]
-        self.kinetic_energy = self.K(theta, omega, 0, 0)
-        self.potential_energy = self.U(theta, 0)
-        self.total_energy = self.kinetic_energy + self.potential_energy
+        kinetic_energy = self.K(theta, omega, 0, 0)
+        potential_energy = self.U(theta, 0)
+        total_energy = kinetic_energy + potential_energy
         
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -158,11 +158,9 @@ class Pendulum():
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set(title='Energy of the Simple Pendulum over time.', ylabel='Energy (J)', xlabel='Time (s)')
-        ax.plot(self.t, self.kinetic_energy, 'b-', label='Kinetic Energy')
-        ax.plot(self.t, self.potential_energy, 'g-', label='Potential Energy')
-        ax.plot(self.t, self.total_energy, 'r-', label='Total Energy')
+        ax.plot(self.t, kinetic_energy, 'b-', label='Kinetic Energy')
+        ax.plot(self.t, potential_energy, 'g-', label='Potential Energy')
+        ax.plot(self.t, total_energy, 'r-', label='Total Energy')
         ax.legend(loc='upper left')
         plt.show()
 
-pendulum = Pendulum.init_simple_pendulum(1, 1, pi/2, 0, 100, 10)
-pendulum.make_simple_pendulum()
