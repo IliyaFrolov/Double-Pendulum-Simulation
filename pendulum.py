@@ -26,6 +26,10 @@ class Pendulum():
         Initial angular displacement of the pendulum bob.
     omega : int
         Initial angular velocity of the pendulum bob.
+    n : int
+        Number of steps in the simple pendulum simulation.
+    time : numpy array
+        Stores the time of the simple pendulum simulation at each step.
     angular_position : numpy array
         Stores the angular displacement of the pendulum bob at each step.
     x_position : numpy array
@@ -39,8 +43,14 @@ class Pendulum():
     
     Methods
     ---------
+    init_simple_pendulum(length, mass, initial_angular_position, initial_anglar_velocity, steps, time)
+        Alternatively used to instantiate a Pendulum object to run the simple pendulum simulation.  
     __repr__()
         A dunder method used to print a summary of information about the pendulum bob.
+    model(t, initial_conditions)
+        Function is used as an input into solve_ivp to get the angular position and velocity of each pendulum bob at the next step.
+    make_simple_pendulum
+        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each interval of self.time.
     '''
 
     def __init__(self, pendulum_bob, length, mass, other_length, other_mass, initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity, steps, time=0):
@@ -69,6 +79,8 @@ class Pendulum():
              Intitial angular velocity of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "initial_angular_velocity" is the initial angular displacement of the top pendulum bob and "other_intial_angular_velocity" is the initial_angular_velocity of the bottom pendulum bob, and vice versa.
         steps: int
             Number of steps in the simulation.
+        time : int
+            Total time the simple pendulum simulation runs for. Is 0 by default if running double pendulum simulation instead.
         '''
 
         self.dwdt = Acceleration(pendulum_bob, length, mass, other_length, other_mass)
@@ -82,7 +94,7 @@ class Pendulum():
         self.theta = initial_angular_position
         self.omega = initial_angular_velocity
         self.n = steps
-        self.t = np.linspace(0, time, steps)
+        self.time = np.linspace(0, time, steps)
         self.angular_position = np.zeros(steps+1)
         self.x_position = np.zeros(steps+1)
         self.y_position = np.zeros(steps+1)
@@ -95,6 +107,30 @@ class Pendulum():
 
     @classmethod
     def init_simple_pendulum(cls, length, mass, initial_angular_position, initial_angular_velocity, steps, time):
+        '''
+        Alternatively used to instantiate a Pendulum object to run the simple pendulum simulation.  
+
+        Parameters
+        ----------
+        length : int
+            Rod length of the pendulum bob.
+        mass : int
+            Mass of the pendulum bob.
+        initial_angular_position : int
+            Intitial angular displacement of the pendulum bob from its equilibrium point.
+        initial_angular_velocity : int
+            Initial angular velocity of the pendulum bob (usually 0 if not at equilibrium).
+        steps: int
+            Number of steps in the simulation.
+        time : int
+            Total time the simple pendulum simulation runs for. Is 0 by default if running double pendulum simulation instead.
+        
+        Returns
+        ---------
+        object
+            Returns a Pendulum object to run a simple pendulum simulation.
+        '''
+
         return cls(1, length, mass, 0, 0, initial_angular_position, initial_angular_velocity, 0, 0, steps, time)
 
     def __repr__(self):
@@ -115,19 +151,19 @@ class Pendulum():
 
     def model(self, t, initial_conditions):
         '''
-        Function is a parameter of solve_ivp. Return of function is used to calculate the angular displacement and velocity of each pendulum bob at the next step.
+        Function is a parameter of solve_ivp. Return of function is used to calculate the angular displacement and velocity of the simple pendulum.
         ...
         Parameters
         -----------
         t : numpy array slice, required
             Time interval between current and next step.
         initial_conditions : list, required
-            List containing the initial angular displacement and velocity of both pendulum bobs at the current step.
+            List containing the initial angular displacement and velocity of the simple pendulum at the current step.
 
         Returns
         ----------
         list
-            List containing the angular velocity and acceleration of both pendulum bobs.
+            List containing the angular velocity and acceleration of the simple pendulum.
         '''
 
         theta = initial_conditions[0]
@@ -137,7 +173,19 @@ class Pendulum():
         return [omega, dwdt]  
     
     def make_simple_pendulum(self):
-        output = solve_ivp(self.model, [0, self.t[-1]], [self.angular_position[0], self.angular_velocity[0]], t_eval=np.linspace(0, self.t[-1], self.n), method='Radau').y
+        '''
+        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each interval of self.time.
+
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -----------
+        None
+        '''
+
+        output = solve_ivp(self.model, [0, self.time[-1]], [self.angular_position[0], self.angular_velocity[0]], t_eval=np.linspace(0, self.time[-1], self.n), method='Radau').y
         theta = output[0]
         omega = output[1]
         kinetic_energy = self.K(theta, omega, 0, 0)
@@ -147,17 +195,17 @@ class Pendulum():
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set(title='Angular displacements of the Simple Pendulum over time.', ylabel='Angular displacement (radians)', xlabel='Time (s)')
-        ax.plot(self.t, theta, 'r-', label='Angular position')
-        ax.plot(self.t, omega, 'b-', label='Angular velocity')
+        ax.plot(self.time, theta, 'r-', label='Angular position')
+        ax.plot(self.time, omega, 'b-', label='Angular velocity')
         ax.legend(loc='upper left')
         plt.show()
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.set(title='Energy of the Simple Pendulum over time.', ylabel='Energy (J)', xlabel='Time (s)')
-        ax.plot(self.t, kinetic_energy, 'b-', label='Kinetic Energy')
-        ax.plot(self.t, potential_energy, 'g-', label='Potential Energy')
-        ax.plot(self.t, total_energy, 'r-', label='Total Energy')
+        ax.plot(self.time, kinetic_energy, 'b-', label='Kinetic Energy')
+        ax.plot(self.time, potential_energy, 'g-', label='Potential Energy')
+        ax.plot(self.time, total_energy, 'r-', label='Total Energy')
         ax.legend(loc='upper left')
         plt.show()
 

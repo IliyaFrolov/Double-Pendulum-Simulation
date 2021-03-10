@@ -23,7 +23,7 @@ def test_pendulum():
     assert pendulum_1.L == 1
     assert pendulum_1.m == 5
     assert pendulum_1.n == 1000
-    assert len(pendulum_2.t) == 1000
+    assert len(pendulum_2.time) == 1000
     assert len(pendulum_1.angular_position) == 1001
     assert len(pendulum_1.x_position) == 1001
     assert len(pendulum_1.y_position) == 1001
@@ -37,7 +37,7 @@ def test_pendulum():
     assert pendulum_2.L == 3
     assert pendulum_2.m == 2
     assert pendulum_2.n == 1000
-    assert len(pendulum_2.t) == 1000
+    assert len(pendulum_2.time) == 1000
     assert len(pendulum_2.angular_position) == 1001
     assert len(pendulum_2.x_position) == 1001
     assert len(pendulum_2.y_position) == 1001
@@ -54,7 +54,7 @@ def test_init_simple_pendulum(pendulum):
     assert pendulum.theta == pi/4
     assert pendulum.omega == pi/2
     assert pendulum.n == 100
-    assert len(pendulum.t) == 100
+    assert len(pendulum.time) == 100
 
 @pytest.mark.parametrize('t, theta, omega', [
     ([1, 2], pi/2, pi),
