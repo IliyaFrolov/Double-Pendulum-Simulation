@@ -37,6 +37,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
     time_to_flip = np.zeros((phasespace_step_size, phasespace_step_size))
     counter = phasespace_step_size**2
     units = np.sqrt(length_1/9.8)
+    levels = [i*units for i in range(100)]
 
     for x, theta_1 in enumerate(initial_theta_1):
         for y, theta_2 in enumerate(initial_theta_2):
@@ -49,7 +50,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, phasespace
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set(title='Phase space plot of the time it takes for the Double Pendulum to flip', ylabel='Initial displacement of top Pendulum (radians)', xlabel='Initial displacement of bottom Pendulum (radians)')
-    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=[0, 5*units, 10*units, 50*units, 100*units, 500*units, 1000*units], cmap='jet' ,extend='max')
+    cp = ax.contourf(angle_1, angle_2, time_to_flip, levels=levels, cmap='jet' ,extend='max')
     fig.colorbar(cp) 
     plt.show()
 

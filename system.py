@@ -189,7 +189,7 @@ class System():
             self.flip_time = self.time[i]
             self.has_flipped = True
 
-    def make_data(self, method='DOP853'):
+    def make_data(self, method='Radau'):
         '''
         Calls self.run_simulation and returns all the computed data as a Pandas Dataframe.
 
