@@ -88,10 +88,7 @@ class Pendulum():
         self.y_position = np.zeros(steps+1)
         self.angular_velocity = np.zeros(steps+1)
         self.angular_acceleration = np.zeros(steps+1)
-        self.kinetic_energy = np.zeros(steps+1)
-        self.potential_energy = np.zeros(steps+1)
-        self.total_energy = np.zeros(steps+1)
-        
+       
         self.angular_position[0] = initial_angular_position
         self.angular_velocity[0] = initial_angular_velocity
         self.angular_acceleration[0] = self.dwdt(initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity)
