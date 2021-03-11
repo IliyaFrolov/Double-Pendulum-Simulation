@@ -11,9 +11,9 @@ class Polar_to_Cartesian():
         Rod length of the pendulum.
     
     Methods
-    ---------
+    ----------
     __call__(theta, coordinate)
-        Dunder method used to compute and return result for the conversion from polar to cartesian coordiantes for x or y.
+        Used to compute and return result for the conversion from polar to cartesian coordiantes for x or y.
     '''
 
     def __init__(self, length):
@@ -21,26 +21,26 @@ class Polar_to_Cartesian():
         Construcuts the necessary attribute for the Polar_to_Cartesian object.
 
         Parameters
-        ---------
+        ----------
         length : int
-            Rod length of the pendulum
+            Rod length of the pendulum.
         '''
 
         self.L = length
 
     def __call__(self, theta, coordinate):
         '''
-        Dunder method used to compute and return result for the conversion from polar to cartesian coordiantes for x or y.
+        Computes and returns the result for the conversion from polar to cartesian coordiantes for x or y.
 
         Parameters
-        ---------
-        theta : int, required
+        ----------
+        theta : int
             Angular displacement to be converted to cartesian coordinates.
-        coordinate : str, required
+        coordinate : str
             Either "x" or "y" indicating the desired coordinate to be returned from the conversion.
         
         Returns
-        ---------
+        ----------
         int
             Returns the computed conversion of the angular displacement for the desired coordinate.
         '''
@@ -59,13 +59,13 @@ class EquationTerms():
     A parent class used to set and store the values of shared terms in the relevant double pendulum equations.
 
     Subclasses
-    --------
+    ----------
     Acceleration
     KineticEnergy
     PotentialEnergy
 
     Attributes
-    ---------
+    ----------
     pendulum_bob : int
         A number either 1 or 2, identifying the top and bottom pendulum respectively.
     g : int
@@ -85,7 +85,7 @@ class EquationTerms():
         Constructs all the necessary attributes to be inherited by the subclasses.
 
         Parameters:
-        ---------
+        ----------
         pendulum_bob : int
             A number either 1 or 2, identifying the top and bottom pendulum respectively.
         length : int
@@ -103,7 +103,7 @@ class EquationTerms():
 
         self.pendulum_bob = pendulum_bob
         self.g = 9.8
-        self.L1 = length if pendulum_bob == 1 else other_length # This assignment technique ensures that the rod lengths and bob masses are always assigned to the correct pendulum bob, i.e. self.L1 will always correspond to the rod length of the top pendulum bob.
+        self.L1 = length if pendulum_bob == 1 else other_length # This assignment technique ensures that the rod lengths and pendulum bob masses are always assigned to the correct pendulum bob, i.e. self.L1 will always correspond to the rod length of the top pendulum bob.
         self.m1 = mass if pendulum_bob == 1 else other_mass
         self.L2 = other_length if pendulum_bob == 1 else length
         self.m2 = other_mass if pendulum_bob == 1 else mass
@@ -114,12 +114,12 @@ class Acceleration(EquationTerms):
 
     Attributes
     ----------
-        All inherited from the parent class "EquationTerms"
+        All inherited from the parent class "EquationTerms".
     
     Methods
     ----------
     __call__(theta, omega, other_theta, other_omega)
-        Dunder method used to compute and return the result of the angular acceleration for a pendulum bob.
+        Computes and returns the result of the angular acceleration for a pendulum bob.
     '''
 
     def __init__(self, pendulum_bob, length, mass, other_length, other_mass):
@@ -127,7 +127,7 @@ class Acceleration(EquationTerms):
         Constructs all the necessary attributes for the Acceleration object.
 
         Parameters:
-        ---------
+        ----------
         pendulum_bob : int
             A number either 1 or 2, identifying the top and bottom pendulum respectively.
         length : int
@@ -144,21 +144,21 @@ class Acceleration(EquationTerms):
     
     def __call__(self, theta, omega, other_theta, other_omega):
         '''
-        Dunder method used to compute and return the result of the angular acceleration for a pendulum bob.
+        Compute and returns the result of the angular acceleration for a pendulum bob.
 
         Parameters
-        ---------
-        theta : int, required
+        ----------
+        theta : int
             Angular displacement of the pendulum bob.
-        omega : int, required
+        omega : int
             Angular velocity of the pendulum bob.
-        other_theta : int, required
+        other_theta : int
             Angular displacement of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "theta" is the angular displacement of the top pendulum bob and "other_theta" is the angular displacement of the bottom pendulum bob, and vice versa.
-        other_omega : int, required
+        other_omega : int
            Angular velocity of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "omega" is the angular velocity of the top pendulum bob and "other_omega" is the angular velocity of the bottom pendulum bob, and vice versa.
         
         Returns
-        ---------
+        ----------
         int
             Returns the computed values of the angular acceleration from the equations of motion.
         '''
@@ -180,7 +180,7 @@ class KineticEnergy(EquationTerms):
     Methods
     ----------
     __call__(theta, omega, other_theta, other_omega)
-        Dunder method used to compute and return the result for the kinetic energy of a pendulum bob.
+        Computes and returns the result for the kinetic energy of a pendulum bob.
     '''
 
     def __init__(self,pendulum_bob, length, mass, other_length, other_mass):
@@ -188,7 +188,7 @@ class KineticEnergy(EquationTerms):
         Constructs all the necessary attributes for the KineticEnergy object.
 
         Parameters:
-        ---------
+        ----------
         pendulum_bob : int
             A number either 1 or 2, identifying the top and bottom pendulum respectively.
         length : int
@@ -205,21 +205,21 @@ class KineticEnergy(EquationTerms):
     
     def __call__(self, theta, omega, other_theta, other_omega):
         '''
-        Dunder method used to compute and return the result for the kinetic energy of a pendulum bob.
+        Computes and returns the result for the kinetic energy of a pendulum bob.
 
         Parameters
-        ---------
-        theta : int, required
+        ----------
+        theta : int
             Angular displacement of the pendulum bob.
-        omega : int, required
+        omega : int
             Angular velocity of the pendulum bob.
-        other_theta : int, required
+        other_theta : int
             Angular displacement of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "theta" is the angular displacement of the top pendulum bob and "other_theta" is the angular displacement of the bottom pendulum bob, and vice versa.
-        other_omega : int, required
+        other_omega : int
            Angular velocity of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "omega" is the angular velocity of the top pendulum bob and "other_omega" is the angular velocity of the bottom pendulum bob, and vice versa.
         
         Returns
-        ---------
+        ----------
         int
             Returns the computed values of the kinetic energy from the equations for the kinetic energy of the double pendulum.
         '''
@@ -240,7 +240,7 @@ class PotentialEnergy(EquationTerms):
     Methods
     ----------
     __call__(theta, omega, other_theta, other_omega)
-        Dunder method used to compute and return the result for the potential energy of a pendulum bob.
+        Computes and returns the result for the potential energy of a pendulum bob.
     '''
     
     def __init__(self, pendulum_bob, length, mass, other_length, other_mass):
@@ -248,7 +248,7 @@ class PotentialEnergy(EquationTerms):
         Constructs all the necessary attributes for the PotentialEnergy object.
 
         Parameters:
-        ---------
+        ----------
         pendulum_bob : int
             A number either 1 or 2, identifying the top and bottom pendulum respectively.
         length : int
@@ -265,17 +265,17 @@ class PotentialEnergy(EquationTerms):
          
     def __call__(self, theta, other_theta):
         '''
-        Dunder method used to compute and return the result of the potential energy for a pendulum bob.
+        Computes and returns the result of the potential energy for a pendulum bob.
 
         Parameters
-        ---------
-        theta : int, required
+        ----------
+        theta : int
             Angular displacement of the pendulum bob.
-        other_theta : int, required
+        other_theta : int
             Angular displacement of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "theta" is the angular displacement of the top pendulum bob and "other_theta" is the angular displacement of the bottom pendulum bob, and vice versa.
         
         Returns
-        ---------
+        ----------
         int
             Returns the computed values of the potential energy from the equations for the potential energy of the double pendulum.
         '''

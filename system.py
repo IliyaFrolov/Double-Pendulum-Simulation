@@ -18,17 +18,17 @@ class System():
     n : int
         Number of steps in the simulation.
     flip_time : int
-        The time it takes for either of the pendulum bobs to flip (set to None by default if there's no flip).
+        The time it takes for either of the pendulum bobs to flip. Is None by default if there's no flip.
     has_flipped : boolean
-        Is set to True if either of the pendulum bobs has flipped, is False otherwise.
+        Is set to True if either of the pendulum bobs has flipped, else is False.
     time : numpy array
-        Stores the time of the simulation at each step.
+        Stores the time of the simulation for each step.
     kinetic_energy : numpy array
-        Stores the kinetic energy of the system at each step.
+        Stores the kinetic energy of the system for each step.
     potential_energy : numpy array
-        Stores the potential energy of the system at each step.
+        Stores the potential energy of the system for each step.
     total_energy : numpy array
-        Stores the total energy of the system at each step.
+        Stores the total energy of the system for each step.
     
     Methods
     ----------
@@ -40,16 +40,16 @@ class System():
         Checks if either of the pendulum bobs has flipped, if so, stores the time of flip.
     make_data(method)
         Calls self.run_simulation and returns all the computed data as a Pandas Dataframe.
-    normalise_angle(anlge)
+    normalise_angle(angle)
         Normalises an angle between -pi and pi. 
     '''
     
     def __init__(self, length_1, mass_1, length_2, mass_2, initial_angular_position_1, initial_angular_velocity_1, initial_angular_position_2, initial_angular_velocity_2, steps, time):
         '''
-        Constructs all the necessary attributes for the System object and sets the initial values for the kinetic energy, potential energy and the total energy.
+        Constructs all the necessary attributes for the System object and sets the initial values for the kinetic energy, potential energy and total energy.
         ...
         Parameters
-        -----------
+        ----------
         length_1 : int
             Rod length of the top pendulum bob.
         mass_1 : int
@@ -96,10 +96,10 @@ class System():
         Function is a parameter of solve_ivp. Return of function is used to calculate the angular displacement and velocity of each pendulum bob at the next step.
         ...
         Parameters
-        -----------
-        t : numpy array slice, required
+        ----------
+        t : numpy array slice
             Time interval between current and next step.
-        initial_conditions : list, required
+        initial_conditions : list
             List containing the initial angular displacement and velocity of both pendulum bobs at the current step.
         
         Returns
@@ -123,13 +123,13 @@ class System():
 
         Parameters
         ----------
-        method : string, required
+        method : string
             Used as a parameter in solve_ivp to select the approximation method to be used.
-        is_phase: Boolean, optional
-            A parameter that is True if the simulation is finding the time of flip, False otherwise.
+        is_phase: Boolean
+            Is True if the simulation is finding the time of flip, False otherwise.
         
         Returns
-        -----------
+        ----------
         None
         '''
 
@@ -148,7 +148,7 @@ class System():
 
             self.check_flip(theta_1, theta_2, i)
 
-            if self.has_flipped and is_phase: # Stops the for loop and ends the function if the flip time is found.
+            if self.has_flipped and is_phase: # Ends the function if the flip time is found.
                 return
 
             self.p1.angular_position[i] = self.normalise_angle(theta_1)
@@ -181,7 +181,7 @@ class System():
             Loop variable 
         
         Returns
-        ---------
+        ----------
         None
         '''
 
@@ -195,11 +195,11 @@ class System():
 
         Parameters
         ----------
-        method : string, optional
-            Used as a parameter in solve_ivp to select the approximation method to be used. Is set the main approximation method by default.
+        method : string
+            Used as a parameter in solve_ivp to select the approximation method to be used. Is set to the main approximation method by default.
         
         Returns
-        ---------
+        ----------
         Dataframe
             A Pandas Dataframe containing the results of the simulation.
         '''
@@ -230,11 +230,11 @@ class System():
 
         Parameters
         ----------
-        angle: int, required
+        angle: int
             Angle to be normalised.
         
         Returns
-        ---------
+        ----------
         int
             Normalised angle.
         '''

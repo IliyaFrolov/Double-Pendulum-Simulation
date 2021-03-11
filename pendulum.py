@@ -4,16 +4,16 @@ import matplotlib.pyplot as plt
 
 class Pendulum():
     '''
-    A class to represent a Pendulum Bob.
+    A class to represent a Pendulum Bob and run a simulation of a single pendulum.
     ...
     Attributes
     ----------
     dwdt : object
-        Instance of the Acceleration class representing the equations of motion.
+        Instance of the Acceleration class representing the equations of motion for the double pendulum.
     K : object
-        Instance of the KineticEnergy class representing the kinetic energy equation for a pendulum bob.
+        Instance of the KineticEnergy class representing the kinetic energy equations for a double pendulum.
     U : object
-        Instance of the PotentialEnergy class representing the potential energy equation for a pendulum bob.
+        Instance of the PotentialEnergy class representing the potential energy equations for a double pendulum.
     convert : object
         Instance of the Polar_to_Cartesian class representing the equation to convert from polar to cartesian coordinates.
     pendulum_bob : int
@@ -29,28 +29,28 @@ class Pendulum():
     n : int
         Number of steps in the simple pendulum simulation.
     time : numpy array
-        Stores the time of the simple pendulum simulation at each step.
+        Stores the time of the simple pendulum simulation for each step.
     angular_position : numpy array
-        Stores the angular displacement of the pendulum bob at each step.
+        Stores the angular displacement of the pendulum bob for each step.
     x_position : numpy array
-        Stores the linear displacement of the pendulum bob in the x direction at each step.
+        Stores the linear displacement of the pendulum bob in the x direction for each step.
     y_position : numpy array
-        Stores the linear displacement of the pendulum bob in the y direction at each step.
+        Stores the linear displacement of the pendulum bob in the y direction for each step.
     angular_velocity : numpy array
-        Stores the angular velocity of the pendulum bob at each step.
+        Stores the angular velocity of the pendulum bob for each step.
     angular_acceleration : numpy array
-        Stores the angular acceleration of the pendulum bob at each step.
+        Stores the angular acceleration of the pendulum bob for each step.
     
     Methods
-    ---------
+    ----------
     init_simple_pendulum(length, mass, initial_angular_position, initial_anglar_velocity, steps, time)
-        Alternatively used to instantiate a Pendulum object to run the simple pendulum simulation.  
+        Used as an alternative to instantiate a Pendulum object for running the simple pendulum simulation.  
     __repr__()
-        A dunder method used to print a summary of information about the pendulum bob.
+        Shows a summary of information about the pendulum bob when printing a Pendulum object.
     model(t, initial_conditions)
         Function is used as an input into solve_ivp to get the angular position and velocity of each pendulum bob at the next step.
     make_simple_pendulum
-        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each interval of self.time.
+        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each step.
     '''
 
     def __init__(self, pendulum_bob, length, mass, other_length, other_mass, initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity, steps, time=0):
@@ -78,7 +78,7 @@ class Pendulum():
         other_initial_angular_velocity_2 : int
              Intitial angular velocity of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "initial_angular_velocity" is the initial angular displacement of the top pendulum bob and "other_intial_angular_velocity" is the initial_angular_velocity of the bottom pendulum bob, and vice versa.
         steps: int
-            Number of steps in the simulation.
+            Number of steps in the simple pendulum simulation.
         time : int
             Total time the simple pendulum simulation runs for. Is 0 by default if running double pendulum simulation instead.
         '''
@@ -108,7 +108,7 @@ class Pendulum():
     @classmethod
     def init_simple_pendulum(cls, length, mass, initial_angular_position, initial_angular_velocity, steps, time):
         '''
-        Alternatively used to instantiate a Pendulum object to run the simple pendulum simulation.  
+        Used as an alternative to instantiate a Pendulum object for running the simple pendulum simulation.
 
         Parameters
         ----------
@@ -121,28 +121,30 @@ class Pendulum():
         initial_angular_velocity : int
             Initial angular velocity of the pendulum bob (usually 0 if not at equilibrium).
         steps: int
-            Number of steps in the simulation.
+            Number of steps in the simple pendulum simulation.
         time : int
             Total time the simple pendulum simulation runs for. Is 0 by default if running double pendulum simulation instead.
         
         Returns
-        ---------
+        ----------
         object
             Returns a Pendulum object to run a simple pendulum simulation.
         '''
+        if length == 0 or mass == 0:
+            raise Exception('Parameters length or mass cannot be equal to 0')
 
         return cls(1, length, mass, 0, 0, initial_angular_position, initial_angular_velocity, 0, 0, steps, time)
 
     def __repr__(self):
         '''
-        A dunder method used to print a summary of information about the pendulum bob.
+        Shows a summary of information about the pendulum bob when printing a Pendulum object.
 
         Parameters
-        ---------
+        ----------
         None
 
         Returns
-        ---------
+        ----------
         str
             A string used to present the summary of information about the pendulum rod including the pendulum bob number, rod length, mass, initial angular displacement and velocity.
         '''
@@ -151,13 +153,13 @@ class Pendulum():
 
     def model(self, t, initial_conditions):
         '''
-        Function is a parameter of solve_ivp. Return of function is used to calculate the angular displacement and velocity of the simple pendulum.
+        Function is a parameter of solve_ivp. Return of the function is used to calculate the angular displacement and velocity of the simple pendulum.
         ...
         Parameters
-        -----------
-        t : numpy array slice, required
+        ----------
+        t : numpy array
             Time interval between current and next step.
-        initial_conditions : list, required
+        initial_conditions : list
             List containing the initial angular displacement and velocity of the simple pendulum at the current step.
 
         Returns
@@ -174,14 +176,14 @@ class Pendulum():
     
     def make_simple_pendulum(self):
         '''
-        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each interval of self.time.
+        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each step.
 
         Parameters
         ----------
         None
         
         Returns
-        -----------
+        ----------
         None
         '''
 
