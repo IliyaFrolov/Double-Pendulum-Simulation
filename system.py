@@ -78,7 +78,7 @@ class System():
         self.p1 = Pendulum(1, length_1, mass_1, length_2, mass_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, steps)
         self.p2 = Pendulum(2, length_2, mass_2, length_1, mass_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, steps)
 
-        self.g = 9.8
+        self.g = g
         self.n = steps
         self.flip_time = None
         self.has_flipped = False
@@ -196,7 +196,7 @@ class System():
         Parameters
         ----------
         method : string
-            Used as a parameter in solve_ivp to select the approximation method to be used. Is set to the main approximation method by default.
+            Used as a parameter in solve_ivp to select the approximation method to be used. Is set to the 5th order Runge-Kutta approximation method by default.
         
         Returns
         ----------

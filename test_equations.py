@@ -43,7 +43,7 @@ class TestEnergy():
         assert potential_1.m1 == mass_1
         assert potential_1.L2 == length_2
         assert potential_1.m2 == mass_2
-        assert potential_1(theta_1, theta_2) == mass_1*9.8*length_1*(1-cos(theta_1))
-        assert potential_2(theta_2, theta_1) == mass_2*9.8*(length_1*(1-cos(theta_1))+length_2*(1-cos(theta_2)))
+        assert potential_1(theta_1, theta_2) == mass_1*g*length_1*(1-cos(theta_1))
+        assert potential_2(theta_2, theta_1) == mass_2*g*(length_1*(1-cos(theta_1))+length_2*(1-cos(theta_2)))
         with pytest.raises(Exception):
             PotentialEnergy(-5, length_1, mass_1, length_2, mass_2)

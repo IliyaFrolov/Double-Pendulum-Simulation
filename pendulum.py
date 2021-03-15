@@ -22,10 +22,6 @@ class Pendulum():
         Rod length of the pendulum bob.
     m : int
         Mass of the pendulum bob.
-    theta : int
-        Initial angular displacement of the pendulum bob.
-    omega : int
-        Initial angular velocity of the pendulum bob.
     n : int
         Number of steps in the simple pendulum simulation.
     time : numpy array
@@ -91,13 +87,11 @@ class Pendulum():
         self.pendulum_bob = pendulum_bob
         self.L = length
         self.m = mass
-        self.theta = initial_angular_position
-        self.omega = initial_angular_velocity
         self.n = steps
-        self.time = np.linspace(0, time, steps)
-        self.angular_position = np.zeros(steps+1)
+        self.time = np.linspace(0, time, steps+1)
         self.x_position = np.zeros(steps+1)
         self.y_position = np.zeros(steps+1)
+        self.angular_position = np.zeros(steps+1)
         self.angular_velocity = np.zeros(steps+1)
         self.angular_acceleration = np.zeros(steps+1)
        
@@ -149,7 +143,7 @@ class Pendulum():
             A string used to present the summary of information about the pendulum rod including the pendulum bob number, rod length, mass, initial angular displacement and velocity.
         '''
         
-        return f'Pendulum: {self.pendulum_bob} ("1" for top bob "2" for bottom bob), Rod Length: {self.L}, Bob Mass: {self.m}, Initial Angular Position: {self.theta}, Initial Angular Velocity: {self.omega}'
+        return f'Pendulum: {self.pendulum_bob} ("1" for top bob "2" for bottom bob), Rod Length: {self.L}, Bob Mass: {self.m}, Initial Angular Position: {self.angular_position[0]}, Initial Angular Velocity: {self.angular_velocity[0]}, Initial Angular Acceleration: {self.angular_acceleration[0]}'
 
     def model(self, t, initial_conditions):
         '''
@@ -170,35 +164,46 @@ class Pendulum():
 
         theta = initial_conditions[0]
         omega = initial_conditions[1]
-        dwdt = -9.8/self.L*sin(theta) 
+        dwdt = -g/self.L*sin(theta) 
 
         return [omega, dwdt]  
     
-    def make_simple_pendulum(self):
+    def make_simple_pendulum(self, method='Radau'):
         '''
-        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each step.
+        Uses solve_ivp within a for loop to obtain and plot the solutions for the simple pendulum at each step.
 
         Parameters
         ----------
-        None
+        method : string
+            Used as a parameter in solve_ivp to select the approximation method to be used. Is set to the 5th order Runge-Kutta approximation method by default.
         
         Returns
         ----------
         None
         '''
 
-        output = solve_ivp(self.model, [0, self.time[-1]], [self.angular_position[0], self.angular_velocity[0]], t_eval=np.linspace(0, self.time[-1], self.n), method='Radau').y
-        theta = output[0]
-        omega = output[1]
-        kinetic_energy = self.K(theta, omega, 0, 0)
-        potential_energy = self.U(theta, 0)
+        for i in range(1, self.n+1):
+            output = solve_ivp(self.model, self.time[i-1: i+1],[self.angular_position[i-1], self.angular_velocity[i-1]], t_eval=np.linspace(self.time[i-1], self.time[i], 2), method=method).y
+            theta = output[0][1]
+            omega = output[1][1]
+
+            self.angular_position[i] = theta
+            self.angular_velocity[i] = omega
+            self.angular_acceleration[i] = -g/self.L*sin(theta) 
+
+        kinetic_energy = self.K(self.angular_position, self.angular_velocity, 0, 0)
+        potential_energy = self.U(self.angular_position, 0)
         total_energy = kinetic_energy + potential_energy
         
         fig = plt.figure()
         ax = fig.add_subplot(111)
+        ax.minorticks_on()
+        ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
+        ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         ax.set(title='Angular displacements of the Simple Pendulum over time.', ylabel='Angular displacement (radians)', xlabel='Time (s)')
-        ax.plot(self.time, theta, 'r-', label='Angular position')
-        ax.plot(self.time, omega, 'b-', label='Angular velocity')
+        ax.plot(self.time, self.angular_position, 'r-', label='Angular position')
+        ax.plot(self.time, self.angular_velocity, 'b-', label='Angular velocity')
+        ax.plot(self.time, self.angular_acceleration, 'g-', label='Angular acceleration')
         ax.legend(loc='upper left')
         plt.show()
 

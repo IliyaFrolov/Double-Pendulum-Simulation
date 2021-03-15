@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import sin, cos, pi
+from scipy.constants import g
 
 class Polar_to_Cartesian():
     '''
@@ -102,7 +103,7 @@ class EquationTerms():
             raise Exception('Parameter "pendulum_bob" must be either 1 or 2.')
 
         self.pendulum_bob = pendulum_bob
-        self.g = 9.8
+        self.g = g 
         self.L1 = length if pendulum_bob == 1 else other_length # This assignment technique ensures that the rod lengths and pendulum bob masses are always assigned to the correct pendulum bob, i.e. self.L1 will always correspond to the rod length of the top pendulum bob.
         self.m1 = mass if pendulum_bob == 1 else other_mass
         self.L2 = other_length if pendulum_bob == 1 else length

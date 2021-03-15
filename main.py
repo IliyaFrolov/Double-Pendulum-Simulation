@@ -42,7 +42,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, angle_step
     for x, theta_1 in enumerate(initial_theta_1):
         for y, theta_2 in enumerate(initial_theta_2):
             pendulum = System(length_1, mass_1, length_2, mass_2, theta_1, 0, theta_2, 0, steps, time)
-            pendulum.run_simulation(method='DOP853', is_phase=True)
+            pendulum.run_simulation(method='Radau', is_phase=True)
             time_to_flip[x][y] = pendulum.flip_time 
             counter -= 1
             print(f'{counter} iterations remaining')
@@ -55,7 +55,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, angle_step
     plt.show()
 
     if file_name:
-        plt.savefig(rf'{os.getcwd()}\graphs\{file_name}.png')
+        plt.savefig(rf'{os.getcwd()}\{file_name}.png')
 
 def make_plot(pendulum_data, plot_energy=False, save=False):
     '''
@@ -98,7 +98,7 @@ def make_plot(pendulum_data, plot_energy=False, save=False):
 
     if save:
         file_name = input('Enter file name: ')
-        fig1.savefig(rf'{os.getcwd()}\graphs\{file_name}.png')
+        fig1.savefig(rf'{os.getcwd()}\{file_name}.png')
 
     if plot_energy:
         fig2 = plt.figure()
@@ -112,7 +112,7 @@ def make_plot(pendulum_data, plot_energy=False, save=False):
 
         if save:
             file_name = input('Enter file name: ')
-            fig2.savefig(rf'{os.getcwd()}\graphs\{file_name}.png')
+            fig2.savefig(rf'{os.getcwd()}\{file_name}.png')
 
 def make_animation(pendulum, pendulum_data, file_name=None):
     '''
@@ -157,7 +157,7 @@ def make_animation(pendulum, pendulum_data, file_name=None):
     plt.show()
 
     if file_name:
-        anim.save(rf'{os.getcwd()}\animations\{file_name}.gif')
+        anim.save(rf'{os.getcwd()}\{file_name}.gif')
 
 def save_data(pendulum_data, file_name):
     '''
@@ -175,7 +175,7 @@ def save_data(pendulum_data, file_name):
     None
     '''
 
-    pendulum_data.to_pickle(rf'{os.getcwd()}\saved_data\{file_name}')
+    pendulum_data.to_pickle(rf'{os.getcwd()}\{file_name}')
 
 def fetch_data(file_name):
     '''
@@ -192,4 +192,4 @@ def fetch_data(file_name):
         Returns the read in pandas dataframe. 
     '''
 
-    return pd.read_pickle(rf'{os.getcwd()}\saved_data\{file_name}')
+    return pd.read_pickle(rf'{os.getcwd()}\{file_name}')
