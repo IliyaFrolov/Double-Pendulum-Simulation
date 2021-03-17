@@ -1,6 +1,7 @@
 from equations import *
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
+import os
 
 class Pendulum():
     '''
@@ -168,7 +169,7 @@ class Pendulum():
 
         return [omega, dwdt]  
     
-    def make_simple_pendulum(self, method='Radau'):
+    def make_simple_pendulum(self, method='Radau', file_name=None):
         '''
         Uses solve_ivp within a for loop to obtain and plot the solutions for the simple pendulum at each step.
 
@@ -176,6 +177,8 @@ class Pendulum():
         ----------
         method : string
             Used as a parameter in solve_ivp to select the approximation method to be used. Is set to the 5th order Runge-Kutta approximation method by default.
+        file_name : str
+            File name of the produced plot to save. If no name is specified, plot is not saved.
         
         Returns
         ----------
@@ -195,8 +198,8 @@ class Pendulum():
         potential_energy = self.U(self.angular_position, 0)
         total_energy = kinetic_energy + potential_energy
         
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+        fig_1 = plt.figure()
+        ax = fig_1.add_subplot(111)
         ax.minorticks_on()
         ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
         ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
@@ -207,12 +210,16 @@ class Pendulum():
         ax.legend(loc='upper left')
         plt.show()
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+        fig_2 = plt.figure()
+        ax = fig_2.add_subplot(111)
         ax.set(title='Energy of the Simple Pendulum over time.', ylabel='Energy (J)', xlabel='Time (s)')
         ax.plot(self.time, kinetic_energy, 'b-', label='Kinetic Energy')
         ax.plot(self.time, potential_energy, 'g-', label='Potential Energy')
         ax.plot(self.time, total_energy, 'r-', label='Total Energy')
         ax.legend(loc='upper left')
         plt.show()
+
+        if file_name:
+            fig_1.savefig(rf'{os.getcwd()}\{file_name}.png')
+            fig_2.savefig(rf'{os.getcwd()}\{file_name}.png')
 
