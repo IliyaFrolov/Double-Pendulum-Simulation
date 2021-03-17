@@ -97,7 +97,7 @@ class Pendulum():
        
         self.angular_position[0] = initial_angular_position
         self.angular_velocity[0] = initial_angular_velocity
-        self.angular_acceleration[0] = self.dwdt(initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity)  #fix this
+        self.angular_acceleration[0] = self.dwdt(initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity)  
 
     @classmethod
     def init_simple_pendulum(cls, length, mass, initial_angular_position, initial_angular_velocity, steps, time):

@@ -6,10 +6,11 @@ from pendulum import Pendulum
 #make_plot(pend_data, plot_energy=True)
 #make_animation(pendulum, pend_data)
 
-#find_phase_space(1, 1, 1, 1, 100, 10, angle_step_size=10)
+#find_phase_space(1, 1, 1, 1, 100, 10, angle_step_size=10, file_name='test_1')
+find_phase_space(1, 1, 1, 1, 100, 10, angle_step_size=10, saved_data='test_1')
 
-pendulum = Pendulum.init_simple_pendulum(1, 1, pi/2, 0, 1000, 10)
-pendulum.make_simple_pendulum(method='Radau')
+#pendulum = Pendulum.init_simple_pendulum(1, 1, pi/2, 0, 1000, 10)
+#pendulum.make_simple_pendulum(method='Radau')
 
 
 

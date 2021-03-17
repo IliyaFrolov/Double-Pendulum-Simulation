@@ -288,5 +288,3 @@ class PotentialEnergy(EquationTerms):
         
         else:
             return self.m1*g*self.L1*(theta**2)/2  
-        
-    

@@ -3,7 +3,7 @@ import os
 from matplotlib import animation 
 from system import System, np, pd, pi
 
-def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, angle_step_size, file_name=None):
+def find_phase_space(length_1=1, mass_1=1, length_2=1, mass_2=1, steps=1, time=100, angle_step_size=50, file_name=None, saved_data=None):
     '''
     Computes the phase space graph for the time it takes for either of the pendulum bobs to flip.
 
@@ -25,28 +25,36 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, angle_step
         Number of points to calculate for each angle e.g. a step size of 10 would correspond to 100 points on the graph (10 for each angle).
     file_name : str
         File name of the produced plot to save. If no name is specified, plot is not saved.
+    saved_data : str
+        File name of the phase space data to load and plot.
     
     Returns
     ----------
     None
     '''
 
-    initial_theta_1 = np.linspace(-pi, pi, angle_step_size)
-    initial_theta_2 = np.linspace(-pi, pi, angle_step_size)
-    angle_1, angle_2 = np.meshgrid(initial_theta_1, initial_theta_2)
-    time_to_flip = np.zeros((angle_step_size, angle_step_size))
-    counter = angle_step_size**2
+    if saved_data:
+        data = np.load(rf'{os.getcwd()}\{saved_data}.npz')
+        angle_1, angle_2 = data['arr_0'], data['arr_1']
+        time_to_flip = data['arr_2']
+
+    else:
+        initial_theta_1 = np.linspace(-pi, pi, angle_step_size)
+        initial_theta_2 = np.linspace(-pi, pi, angle_step_size)
+        angle_1, angle_2 = np.meshgrid(initial_theta_1, initial_theta_2)
+        time_to_flip = np.zeros((angle_step_size, angle_step_size))
+        counter = angle_step_size**2
+
+        for x, theta_1 in enumerate(initial_theta_1):
+            for y, theta_2 in enumerate(initial_theta_2):
+                pendulum = System(length_1, mass_1, length_2, mass_2, theta_1, 0, theta_2, 0, steps, time)
+                pendulum.run_simulation(method='Radau', is_phase=True)
+                time_to_flip[x][y] = pendulum.flip_time 
+                counter -= 1
+                print(f'{counter} iterations remaining')
+        
     units = np.sqrt(length_1/9.8)
-    levels = [i*units for i in range(100)]
-
-    for x, theta_1 in enumerate(initial_theta_1):
-        for y, theta_2 in enumerate(initial_theta_2):
-            pendulum = System(length_1, mass_1, length_2, mass_2, theta_1, 0, theta_2, 0, steps, time)
-            pendulum.run_simulation(method='Radau', is_phase=True)
-            time_to_flip[x][y] = pendulum.flip_time 
-            counter -= 1
-            print(f'{counter} iterations remaining')
-
+    levels = [i*units for i in range(1000)]
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set(title='Phase space plot of the time it takes for the Double Pendulum to flip', ylabel='Initial displacement of top Pendulum (radians)', xlabel='Initial displacement of bottom Pendulum (radians)')
@@ -56,6 +64,7 @@ def find_phase_space(length_1, mass_1, length_2, mass_2, steps, time, angle_step
 
     if file_name:
         plt.savefig(rf'{os.getcwd()}\{file_name}.png')
+        np.savez(rf'{os.getcwd()}\{file_name}', angle_1, angle_2, time_to_flip)
 
 def make_plot(pendulum_data, plot_energy=False, save=False):
     '''
