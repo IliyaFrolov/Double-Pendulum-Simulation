@@ -13,8 +13,6 @@ class System():
         Instance of the Pendulum class representing the top pendulum.
     p2 : object
         Instance of the Pendulum class representing the bottom pendulum.
-    g : int
-        Gravitational acceleration constant.
     n : int
         Number of steps in the simulation.
     flip_time : int
@@ -78,7 +76,6 @@ class System():
         self.p1 = Pendulum(1, length_1, mass_1, length_2, mass_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, steps)
         self.p2 = Pendulum(2, length_2, mass_2, length_1, mass_1, self.normalise_angle(initial_angular_position_2), initial_angular_velocity_2, self.normalise_angle(initial_angular_position_1), initial_angular_velocity_1, steps)
 
-        self.g = g
         self.n = steps
         self.flip_time = None
         self.has_flipped = False

@@ -16,7 +16,6 @@ def system():
 def test_system_init(system):
     assert isinstance(system.p1, Pendulum)
     assert isinstance(system.p2, Pendulum)
-    assert system.g == g
     assert system.n == 1000
     assert system.flip_time == None
     assert system.has_flipped == False

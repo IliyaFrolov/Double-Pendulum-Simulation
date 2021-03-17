@@ -97,7 +97,7 @@ class Pendulum():
        
         self.angular_position[0] = initial_angular_position
         self.angular_velocity[0] = initial_angular_velocity
-        self.angular_acceleration[0] = self.dwdt(initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity)
+        self.angular_acceleration[0] = self.dwdt(initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity)  #fix this
 
     @classmethod
     def init_simple_pendulum(cls, length, mass, initial_angular_position, initial_angular_velocity, steps, time):
@@ -127,7 +127,7 @@ class Pendulum():
         if length == 0 or mass == 0:
             raise Exception('Parameters length or mass cannot be equal to 0')
 
-        return cls(1, length, mass, 0, 0, initial_angular_position, initial_angular_velocity, 0, 0, steps, time)
+        return cls(3, length, mass, 0, 0, initial_angular_position, initial_angular_velocity, 0, 0, steps, time)
 
     def __repr__(self):
         '''
@@ -164,7 +164,7 @@ class Pendulum():
 
         theta = initial_conditions[0]
         omega = initial_conditions[1]
-        dwdt = -g/self.L*sin(theta) 
+        dwdt = -g/self.L*theta 
 
         return [omega, dwdt]  
     
@@ -189,7 +189,7 @@ class Pendulum():
 
             self.angular_position[i] = theta
             self.angular_velocity[i] = omega
-            self.angular_acceleration[i] = -g/self.L*sin(theta) 
+            self.angular_acceleration[i] = -g/self.L*theta 
 
         kinetic_energy = self.K(self.angular_position, self.angular_velocity, 0, 0)
         potential_energy = self.U(self.angular_position, 0)

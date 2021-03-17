@@ -25,6 +25,7 @@ class TestEnergy():
     def test_kineticenergy(self, length_1, mass_1, length_2, mass_2, theta_1, omega_1, theta_2, omega_2):
         kinetic_1 = KineticEnergy(1, length_1, mass_1, length_2, mass_2)
         kinetic_2 = KineticEnergy(2, length_2, mass_2, length_1, mass_1)
+        kinetic_3 = KineticEnergy(3, length_1, mass_1, length_2, mass_2)
 
         assert kinetic_1.L1 == length_1
         assert kinetic_1.m1 == mass_1
@@ -32,12 +33,14 @@ class TestEnergy():
         assert kinetic_1.m2 == mass_2
         assert kinetic_1(theta_1, omega_1, theta_2, omega_2) == mass_1/2*length_1**2*omega_1**2
         assert kinetic_2(theta_2, omega_2, theta_1, omega_1) == mass_2/2*(length_1**2*omega_1**2+length_2**2*omega_2**2+2*length_1*length_2*omega_1*omega_2*cos(theta_1-theta_2))
+        assert kinetic_3(theta_1, omega_1, theta_2, omega_2) == mass_1/2*length_1**2*omega_1**2
         with pytest.raises(Exception):
-            KineticEnergy(3, length_1, mass_1, length_2, mass_2)
+            KineticEnergy(4, length_1, mass_1, length_2, mass_2)
 
     def test_potentialenergy(self, length_1, mass_1, length_2, mass_2, theta_1, omega_1, theta_2, omega_2):
         potential_1 = PotentialEnergy(1, length_1, mass_1, length_2, mass_2)
         potential_2 = PotentialEnergy(2, length_2, mass_2, length_1, mass_1)
+        potential_3 = PotentialEnergy(3, length_1, mass_1, length_2, mass_2)
 
         assert potential_1.L1 == length_1
         assert potential_1.m1 == mass_1
@@ -45,5 +48,6 @@ class TestEnergy():
         assert potential_1.m2 == mass_2
         assert potential_1(theta_1, theta_2) == mass_1*g*length_1*(1-cos(theta_1))
         assert potential_2(theta_2, theta_1) == mass_2*g*(length_1*(1-cos(theta_1))+length_2*(1-cos(theta_2)))
+        assert potential_3(theta_1, theta_2) == mass_1*g*length_1*(theta_1**2)/2  
         with pytest.raises(Exception):
             PotentialEnergy(-5, length_1, mass_1, length_2, mass_2)

@@ -68,9 +68,7 @@ class EquationTerms():
     Attributes
     ----------
     pendulum_bob : int
-        A number either 1 or 2, identifying the top and bottom pendulum respectively.
-    g : int
-        Gravitational acceleration constant.
+        A number either 1, 2 or 3 identifying the top pendulun bob, bottom pendulum bob or a simple pendulum respectively.
     L1 : int
         Rod length of the top pendulum bob.
     m1 : int
@@ -88,7 +86,7 @@ class EquationTerms():
         Parameters:
         ----------
         pendulum_bob : int
-            A number either 1 or 2, identifying the top and bottom pendulum respectively.
+            A number either 1, 2 or 3 identifying the top pendulun bob, bottom pendulum bob or a simple pendulum respectively.
         length : int
             Rod length of the pendulum bob.
         mass : int
@@ -99,15 +97,14 @@ class EquationTerms():
             Mass of the other pendulum bob, i.e. if parameter "pendulum_bob" is 1, "mass" is the mass of the top pendulum bob and "other_length" is the mass of the bottom pendulum bob, and vice versa.
         '''
 
-        if pendulum_bob != 1 and pendulum_bob != 2:
-            raise Exception('Parameter "pendulum_bob" must be either 1 or 2.')
+        if pendulum_bob != 1 and pendulum_bob != 2 and pendulum_bob != 3:
+            raise Exception('Parameter "pendulum_bob" must be either 1, 2 or 3.')
 
         self.pendulum_bob = pendulum_bob
-        self.g = g 
-        self.L1 = length if pendulum_bob == 1 else other_length # This assignment technique ensures that the rod lengths and pendulum bob masses are always assigned to the correct pendulum bob, i.e. self.L1 will always correspond to the rod length of the top pendulum bob.
-        self.m1 = mass if pendulum_bob == 1 else other_mass
-        self.L2 = other_length if pendulum_bob == 1 else length
-        self.m2 = other_mass if pendulum_bob == 1 else mass
+        self.L1 = length if pendulum_bob == 1 or pendulum_bob == 3 else other_length # This assignment technique ensures that the rod lengths and pendulum bob masses are always assigned to the correct pendulum bob, i.e. self.L1 will always correspond to the rod length of the top pendulum bob.
+        self.m1 = mass if pendulum_bob == 1 or pendulum_bob == 3 else other_mass
+        self.L2 = other_length if pendulum_bob == 1 or pendulum_bob == 3 else length
+        self.m2 = other_mass if pendulum_bob == 1 or pendulum_bob == 3 else mass
 
 class Acceleration(EquationTerms):
     '''
@@ -130,7 +127,7 @@ class Acceleration(EquationTerms):
         Parameters:
         ----------
         pendulum_bob : int
-            A number either 1 or 2, identifying the top and bottom pendulum respectively.
+            A number either 1, 2 or 3 identifying the top pendulun bob, bottom pendulum bob or a simple pendulum respectively.
         length : int
             Rod length of the pendulum bob.
         mass : int
@@ -145,7 +142,7 @@ class Acceleration(EquationTerms):
     
     def __call__(self, theta, omega, other_theta, other_omega):
         '''
-        Compute and returns the result of the angular acceleration for a pendulum bob.
+        Compute and returns the result of the angular acceleration for the corresponding pendulum bob.
 
         Parameters
         ----------
@@ -163,12 +160,15 @@ class Acceleration(EquationTerms):
         int
             Returns the computed values of the angular acceleration from the equations of motion.
         '''
-        if self.pendulum_bob == 1:
-            return (-self.g*(2*self.m1+self.m2)*sin(theta)-self.m2*self.g*sin(theta-2*other_theta)-2*sin(theta-other_theta)*self.m2*(other_omega**2*self.L2+omega**2*self.L1*cos(theta-other_theta))) / (self.L1*(2*self.m1+self.m2-self.m2*cos(2*theta-2*other_theta)))
 
-        else:
-            return (2*sin(other_theta-theta)*(other_omega**2*self.L1*(self.m1+self.m2)+self.g*(self.m1+self.m2)*cos(other_theta)+omega**2*self.L2*self.m2*cos(other_theta-theta))) / (self.L2*(2*self.m1+self.m2-self.m2*cos(2*other_theta-2*theta)))
+        if self.pendulum_bob == 1:
+            return (-g*(2*self.m1+self.m2)*sin(theta)-self.m2*g*sin(theta-2*other_theta)-2*sin(theta-other_theta)*self.m2*(other_omega**2*self.L2+omega**2*self.L1*cos(theta-other_theta))) / (self.L1*(2*self.m1+self.m2-self.m2*cos(2*theta-2*other_theta)))
+
+        elif self.pendulum_bob == 2:
+            return (2*sin(other_theta-theta)*(other_omega**2*self.L1*(self.m1+self.m2)+g*(self.m1+self.m2)*cos(other_theta)+omega**2*self.L2*self.m2*cos(other_theta-theta))) / (self.L2*(2*self.m1+self.m2-self.m2*cos(2*other_theta-2*theta)))
         
+        else:
+            return -g/self.L1*theta 
 
 class KineticEnergy(EquationTerms):
     '''
@@ -191,7 +191,7 @@ class KineticEnergy(EquationTerms):
         Parameters:
         ----------
         pendulum_bob : int
-            A number either 1 or 2, identifying the top and bottom pendulum respectively.
+            A number either 1, 2 or 3 identifying the top pendulun bob, bottom pendulum bob or a simple pendulum respectively.
         length : int
             Rod length of the pendulum bob.
         mass : int
@@ -206,7 +206,7 @@ class KineticEnergy(EquationTerms):
     
     def __call__(self, theta, omega, other_theta, other_omega):
         '''
-        Computes and returns the result for the kinetic energy of a pendulum bob.
+        Computes and returns the result for the kinetic energy of the corresponding pendulum bob.
 
         Parameters
         ----------
@@ -222,9 +222,9 @@ class KineticEnergy(EquationTerms):
         Returns
         ----------
         int
-            Returns the computed values of the kinetic energy from the equations for the kinetic energy of the double pendulum.
+            Returns the computed values of the kinetic energy.
         '''
-        if self.pendulum_bob == 1:
+        if self.pendulum_bob == 1 or self.pendulum_bob == 3: # The kinetic energy for the top pendulum bob and for a simple pendulum is the same.
             return self.m1/2*self.L1**2*omega**2
         
         else:
@@ -251,7 +251,7 @@ class PotentialEnergy(EquationTerms):
         Parameters:
         ----------
         pendulum_bob : int
-            A number either 1 or 2, identifying the top and bottom pendulum respectively.
+            A number either 1, 2 or 3 identifying the top pendulun bob, bottom pendulum bob or a simple pendulum respectively.
         length : int
             Rod length of the pendulum bob.
         mass : int
@@ -266,7 +266,7 @@ class PotentialEnergy(EquationTerms):
          
     def __call__(self, theta, other_theta):
         '''
-        Computes and returns the result of the potential energy for a pendulum bob.
+        Computes and returns the result of the potential energy of the corresponding pendulum bob.
 
         Parameters
         ----------
@@ -278,12 +278,15 @@ class PotentialEnergy(EquationTerms):
         Returns
         ----------
         int
-            Returns the computed values of the potential energy from the equations for the potential energy of the double pendulum.
+            Returns the computed value of the potential energy.
         '''
         if self.pendulum_bob == 1:
-            return self.m1*self.g*self.L1*(1-cos(theta))  
+            return self.m1*g*self.L1*(1-cos(theta))  
+        
+        elif self.pendulum_bob == 2:
+            return self.m2*g*(self.L1*(1-cos(other_theta))+self.L2*(1-cos(theta)))
         
         else:
-            return self.m2*self.g*(self.L1*(1-cos(other_theta))+self.L2*(1-cos(theta)))
+            return self.m1*g*self.L1*(theta**2)/2  
         
     
