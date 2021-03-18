@@ -47,8 +47,8 @@ class Pendulum():
         Shows a summary of information about the pendulum bob when printing a Pendulum object.
     model(t, initial_conditions)
         Function is used as an input into solve_ivp to get the angular position and velocity of each pendulum bob at the next step.
-    make_simple_pendulum(method, file_name)
-        Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each step.
+    make_data(method)
+        Uses solve_ivp to obtain the solutions for the simple pendulum at each step.
     '''
 
     def __init__(self, pendulum_bob, length, mass, other_length, other_mass, initial_angular_position, initial_angular_velocity, other_initial_angular_position, other_initial_angular_velocity, steps, time=0):
@@ -170,16 +170,14 @@ class Pendulum():
 
         return [omega, dwdt]  
     
-    def make_simple_pendulum(self, method='Radau', file_name=None):
+    def make_data(self, method='Radau'):
         '''
-        Uses solve_ivp within a for loop to obtain and plot the solutions for the simple pendulum at each step.
+        Uses solve_ivp within a for loop to obtain the solutions for the simple pendulum at each step.
 
         Parameters
         ----------
         method : string
             Used as a parameter in solve_ivp to select the approximation method to be used. Is set to the 5th order Runge-Kutta approximation method by default.
-        file_name : str
-            File name of the produced plot to save. If no name is specified, plot is not saved.
         
         Returns
         ----------
@@ -199,31 +197,6 @@ class Pendulum():
         kinetic_energy = self.K(self.angular_position, self.angular_velocity, 0, 0)
         potential_energy = self.U(self.angular_position, 0)
         total_energy = kinetic_energy + potential_energy
-        
-        fig_1 = plt.figure()
-        ax = fig_1.add_subplot(111)
-        ax.minorticks_on()
-        ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
-        ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
-        ax.set(title='Angular displacements of the Simple Pendulum over time.', ylabel='Angular displacement (radians)', xlabel='Time (s)')
-        ax.plot(self.time, self.angular_position, 'r-', label='Angular position')
-        ax.plot(self.time, self.angular_velocity, 'b-', label='Angular velocity')
-        ax.plot(self.time, self.angular_acceleration, 'g-', label='Angular acceleration')
-        ax.legend(loc='upper left')
-        plt.show()
-
-        fig_2 = plt.figure()
-        ax = fig_2.add_subplot(111)
-        ax.set(title='Energy of the Simple Pendulum over time.', ylabel='Energy (J)', xlabel='Time (s)')
-        ax.plot(self.time, kinetic_energy, 'b-', label='Kinetic Energy')
-        ax.plot(self.time, potential_energy, 'g-', label='Potential Energy')
-        ax.plot(self.time, total_energy, 'r-', label='Total Energy')
-        ax.legend(loc='upper left')
-        plt.show()
-
-        if file_name:
-            fig_1.savefig(rf'{os.getcwd()}\{file_name}.png')
-            fig_2.savefig(rf'{os.getcwd()}\{file_name}.png')
         
         return pd.DataFrame({
         'Time': self.time,
