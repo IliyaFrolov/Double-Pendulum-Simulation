@@ -1,5 +1,6 @@
 from equations import *
 from scipy.integrate import solve_ivp
+import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
@@ -46,7 +47,7 @@ class Pendulum():
         Shows a summary of information about the pendulum bob when printing a Pendulum object.
     model(t, initial_conditions)
         Function is used as an input into solve_ivp to get the angular position and velocity of each pendulum bob at the next step.
-    make_simple_pendulum
+    make_simple_pendulum(method, file_name)
         Uses solve_ivp to obtain and plot the solutions for the simple pendulum at each step.
     '''
 
@@ -182,7 +183,8 @@ class Pendulum():
         
         Returns
         ----------
-        None
+        Dataframe
+            A Pandas Dataframe containing the results of the simulation.
         '''
 
         for i in range(1, self.n+1):
@@ -222,4 +224,14 @@ class Pendulum():
         if file_name:
             fig_1.savefig(rf'{os.getcwd()}\{file_name}.png')
             fig_2.savefig(rf'{os.getcwd()}\{file_name}.png')
+        
+        return pd.DataFrame({
+        'Time': self.time,
+        'Angular position': self.angular_position,
+        'Angular velocity': self.angular_velocity,
+        'Angular acceleration': self.angular_acceleration,
+        'Kinetic energy': kinetic_energy,
+        'Potential energy': potential_energy,
+        'Total energy': total_energy
+        })
 

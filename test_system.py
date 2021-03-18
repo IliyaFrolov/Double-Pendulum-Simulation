@@ -41,28 +41,19 @@ def test_model(system, t, theta_1, omega_1, theta_2, omega_2):
     dwdt_2 = system.p2.dwdt(theta_2, omega_2, theta_1, omega_1)
     assert system.model(t, [theta_1, omega_1, theta_2, omega_2]) == [omega_1, dwdt_1, omega_2, dwdt_2]
 
-def test_check_flip(system):
-    theta_1, theta_2, i = pi/2, pi/4 , 2
-    system.has_flipped = False
+@pytest.mark.parametrize('theta_1, theta_2, i, expected', [
+    (pi/2, pi/4, 2, False),
+    (pi, -pi, 3, False),
+    (2*pi, pi/4, 4, True)
+])
+def test_check_flip(system, theta_1, theta_2, i, expected):
     system.check_flip(theta_1, theta_2, i)
-    assert system.has_flipped == False
-
-    theta_1, theta_2, i = pi, -pi , 2
-    system.has_flipped = False
-    system.check_flip(theta_1, theta_2, i)
-    assert system.has_flipped == False
-
-    theta_1, theta_2, i = 2*pi, pi/4 , 2
-    system.has_flipped = False
-    system.check_flip(theta_1, theta_2, i)
-    assert system.has_flipped == True
-
+    assert system.has_flipped == expected
 
 @pytest.mark.parametrize('angle, expected', [
     (pi/2, pi/2), (pi, pi),
     (-1.5*pi, pi/2), (2*pi, 0),
     (-pi, -pi), (-3*pi, -pi), 
-    (13*pi, -pi) 
     ])
 def test_normalise_angle(angle, expected):
     assert isclose(System.normalise_angle(angle), expected)
