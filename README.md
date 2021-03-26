@@ -2,15 +2,15 @@ Instructions:
 The simulation is ran by creating objects and calling functions or methods from the "run.py" file. A step by step guide to running a double pendulum  and simple pendulum simulation is outlined below:
 
 Double Pendulum
-- Instantiate an object of the 'Sytem' class with the desired parameters.
-- Call the 'make_'data' method from the 'System' class to return a Pandas Dataframe containing the simulation results.
+- Instantiate an object of the 'System' class with the desired parameters.
+- Call the 'make_data' method from the 'System' class to return a Pandas Dataframe containing the simulation results.
 - Choose to save the data locally by calling the 'save_data' function. Consequently, you can retreieve the saved data by calling the 'fetch_data' funciton returning the saved Pandas Dataframe.
 - Choose to call 'make_plot_doublepend', 'make_plot_error' or 'make_animation' function to generate the desired plots and animations.
-- Spereately, call 'make_phase_space' function to generate a phase space plot of the double pendulum.
+- Separately, call 'make_phase_space' function to generate a phase space plot of the double pendulum.
 
 Single Pendulum
 - Instantiate an object of the 'Pendulum' class by calling the class method 'init_simple_pendulum' with the desired parameters. 
-- Call the 'make_'data' method from the 'Pendulum' class to return a Pandas Dataframe containing the simulation results.
+- Call the 'make_data' method from the 'Pendulum' class to return a Pandas Dataframe containing the simulation results.
 - Choose to save the data locally by calling the 'save_data' function. Consequently, you can retreieve the saved data by calling the 'fetch_data' funciton returning the saved Pandas Dataframe.
 - Call 'make_plot_singlepend' function to generate plots for the simple pendulum.
 
