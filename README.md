@@ -1,5 +1,3 @@
-# turbo-eureka
-
 Instructions:
 The simulation is ran by creating objects and calling functions or methods from the "run.py" file. A step by step guide to running a double pendulum  and simple pendulum simulation is outlined below:
 
