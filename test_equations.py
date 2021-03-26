@@ -9,7 +9,7 @@ import pytest
 ])
 def test_polar_to_cartesian(length, angle, coordinate, x_expected, y_expected):
     convert = Polar_to_Cartesian(length)
-    
+
     assert round(convert(angle, 'x'), 3) == round(x_expected , 3)
     assert round(convert(angle, 'y'), 3) == round(y_expected, 3)
     with pytest.raises(Exception):
@@ -20,7 +20,7 @@ def test_polar_to_cartesian(length, angle, coordinate, x_expected, y_expected):
     (4, 4, 3, 1, 5*pi, 0, pi/2, 6),
     (0, 1, 10, 4, 2, 3*pi, 0, 2)
 ])
-class TestEnergy():
+class TestEnergy(): # class created to share the parametrization across multiple functinons.
 
     def test_kineticenergy(self, length_1, mass_1, length_2, mass_2, theta_1, omega_1, theta_2, omega_2):
         kinetic_1 = KineticEnergy(1, length_1, mass_1, length_2, mass_2)
@@ -41,7 +41,6 @@ class TestEnergy():
         potential_1 = PotentialEnergy(1, length_1, mass_1, length_2, mass_2)
         potential_2 = PotentialEnergy(2, length_2, mass_2, length_1, mass_1)
         potential_3 = PotentialEnergy(3, length_1, mass_1, length_2, mass_2)
-
         assert potential_1.L1 == length_1
         assert potential_1.m1 == mass_1
         assert potential_1.L2 == length_2

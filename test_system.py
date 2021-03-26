@@ -24,9 +24,9 @@ def test_system_init(system):
     assert len(system.potential_energy) == 1001
     assert len(system.total_energy) == 1001
     assert system.kinetic_energy[0] == system.p1.m/2*system.p1.L**2*system.p1.angular_velocity[0]**2 + system.p2.m/2*(system.p1.L**2*system.p1.angular_velocity[0]**2+system.p2.L**2*system.p2.angular_velocity[0]**2+2*system.p1.L*system.p2.L*system.p1.angular_velocity[0]*system.p2.angular_velocity[0]*cos(system.p1.angular_position[0]-system.p2.angular_position[0]))
-    assert system.potential_energy[0] ==  system.p1.m*g*system.p1.L*(1-cos(system.p1.angular_position[0])) + system.p2.m*g*(system.p1.L*(1-cos(system.p1.angular_position[0]))+system.p2.L*(1-cos(system.p2.angular_position[0])))  
+    assert system.potential_energy[0] == system.p1.m*g*system.p1.L*(1-cos(system.p1.angular_position[0])) + system.p2.m*g*(system.p1.L*(1-cos(system.p1.angular_position[0]))+system.p2.L*(1-cos(system.p2.angular_position[0])))  
     assert system.total_energy[0] == system.kinetic_energy[0] + system.potential_energy[0]
-
+   
     with pytest.raises(Exception):
         System(1, 0, 1, 1, pi/2, 0, pi/2, 0, 10, 10)
         System(1, 1, 0, 0, pi/2, 0, pi/2, 0, 10, 10)
@@ -39,6 +39,7 @@ def test_system_init(system):
 def test_model(system, t, theta_1, omega_1, theta_2, omega_2):
     dwdt_1 = system.p1.dwdt(theta_1, omega_1, theta_2, omega_2)
     dwdt_2 = system.p2.dwdt(theta_2, omega_2, theta_1, omega_1)
+   
     assert system.model(t, [theta_1, omega_1, theta_2, omega_2]) == [omega_1, dwdt_1, omega_2, dwdt_2]
 
 @pytest.mark.parametrize('theta_1, theta_2, i, expected', [
@@ -57,6 +58,7 @@ def test_check_flip(system, theta_1, theta_2, i, expected):
     ])
 def test_normalise_angle(angle, expected):
     assert isclose(System.normalise_angle(angle), expected)
+
 
 
 
